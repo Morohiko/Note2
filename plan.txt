@@ -1,26 +1,25 @@
-щоденник
+diary
 
-1. шифрування
-1.1 для кожного фалу свій пароль
-1.2 (пароль як ключ для шифрування, дешифрування)/(пароль для доступу до файлу)?
+1. encryption
+ 1.1 for each file your password
+ 1.2 (password as encryption, decryption key) / (file access password)?
 
-2. читання/запис в 1 файл
-2.1 (зміст, який знаходиться на початку файлу)/(в кінці файлу)/(розкиданий по файлу(після кожного розділу хедер з інфою про наступний розділ))
-2.2 для змісту в цілому потрібна
-    -дата, час
-2.2.1 для розкиданого змісту потрібна
-    -кількість байт, який займає наступний розділ
-    -довгий запис в календар(прийдеться проходитись по всьому файлу)хотяя
-2.2.2 для змісту на початку файлу -
-    -залишити пам'ять для всього змісту(трабла, хз скільки виділити, пам'ять може закінчитись)
-2.2.3 для змісту в кінці файлу
-    -переміщати кожен раз весь зміст
-    -адресу на початок кожного розділу
-    -кількість байт для цего розділу
-    +швидкий запис в календар
-    -довгий запис в файл, якщо зміст великий
+2. read / write to 1 file
+ 2.1 (contents at the beginning of the file) / (at the end of the file) / (scattered through the file (after each section is header with info about the next section))
+ 2.2 for the content as a whole is required
+     - yes, time
+  2.2.1 required for scattered content
+      - the number of bytes occupying the next section
+      -Long entry to the calendar (will have to walk around the file) though
+  2.2.2 for content at the beginning of the file -
+      - leave memory for all content (trabla, xz how much to allocate, memory may run out)
+  2.2.3 for end-of-file content
+      -move all content every time
+      -address at the beginning of each section
+      - the number of bytes for this section
+      + quick calendar entry
+      - Long file entry if content is large
 
-3. календар
+3. calendar
 
-4. гуї?
-
+4. Guys?
