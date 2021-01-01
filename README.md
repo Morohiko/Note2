@@ -12,7 +12,7 @@ need copy note2.exe file from win/build-note2-Desktop_Qt_5_11_2_MSVC2017_64bit3-
 ## Linux
 
 ### how to build:
-- cd win/note
+- cd win/note2
 - mkdir build
 - cd build
 - qmake ..
