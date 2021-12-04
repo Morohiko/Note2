@@ -2,4 +2,4 @@ win/build*
 win/note2/build
 examples/for_win/Debug
 examples/for_win/for_win/Debug
-
+*.o
