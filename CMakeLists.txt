@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1.0)
 
 set(PROJECT_NAME "note2")
-
+set(PLATFORM_NAME "platform")
 project(${PROJECT_NAME} VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -17,17 +17,23 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-include_directories(win/note2/)
+include_directories(source)
+include_directories(platforms/qt)
+
+add_library(${PLATFORM_NAME}
+    platforms/qt/mainwindow.cpp
+    platforms/qt/treeitem.cpp)
+
+
 add_executable(${PROJECT_NAME}
-    win/note2/parser.cpp
-    win/note2/interface/mainwindow.cpp
-    win/note2/interface/treeitem.cpp
-    win/note2/file.cpp
-    win/note2/main.cpp
-    win/note2/note.cpp
-    win/note2/utils.cpp
-    win/note2/timesheet.cpp
-    win/note2/encoder.cpp
+    source/parser.cpp
+    source/file.cpp
+    source/main.cpp
+    source/note.cpp
+    source/utils.cpp
+    source/timesheet.cpp
+    source/encoder.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core)
+target_link_libraries(${PLATFORM_NAME} Qt5::Widgets Qt5::Core)
+target_link_libraries(${PROJECT_NAME} ${PLATFORM_NAME} Qt5::Widgets Qt5::Core)
