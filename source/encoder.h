@@ -1,5 +1,6 @@
-#pragma once
-//#define _CRT_SECURE_NO_WARNINGS
+#ifndef ENCODER_H
+#define ENCODER_H
+
 #include <QString>
 
 class Encoder
@@ -19,3 +20,4 @@ public:
     int decodeStringByKey(char *key, char *src, char *dest);
 };
 
+#endif // ENCODER_H

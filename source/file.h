@@ -1,5 +1,6 @@
-#pragma once
-//#define _CRT_SECURE_NO_WARNINGS
+#ifndef FILE_H
+#define FILE_H
+
 #include <QFile>
 
 class File
@@ -14,4 +15,4 @@ private:
     int cFileExists(const QString filename);
 };
 
-
+#endif // FILE_H
