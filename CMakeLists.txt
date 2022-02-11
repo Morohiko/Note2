@@ -35,8 +35,6 @@ add_executable(${PROJECT_NAME}
     source/file.cpp
     source/main.cpp
     source/note.cpp
-    source/utils.cpp
-    source/timesheet.cpp
     source/encoder.cpp
 )
 
