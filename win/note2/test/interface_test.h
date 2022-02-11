@@ -1,5 +1,0 @@
-#ifndef INTERFACETEST_H
-#define INTERFACETEST_H
-
-
-#endif // INTERFACETEST_H

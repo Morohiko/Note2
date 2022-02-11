@@ -24,7 +24,6 @@ add_executable(${PROJECT_NAME}
     win/note2/interface/treeitem.cpp
     win/note2/file.cpp
     win/note2/main.cpp
-    win/note2/core.cpp
     win/note2/note.cpp
     win/note2/utils.cpp
     win/note2/timesheet.cpp
