@@ -1,3 +1,4 @@
+build*
 win/build*
 win/note2/build
 examples/for_win/Debug

@@ -17,3 +17,9 @@ need copy note2.exe file from win/build-note2-Desktop_Qt_5_11_2_MSVC2017_64bit3-
 - cd build
 - qmake ..
 - make
+
+### build using cmake
+mkdir build
+cd build
+cmake ..
+make
