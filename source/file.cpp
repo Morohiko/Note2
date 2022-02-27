@@ -1,116 +1,61 @@
+#include <iostream>
+#include <fstream>
+
 #include "file.h"
 #include "config.h"
 
-#include <QTextStream>
-#include <QDebug>
-
-int File::cFileExists(const QString filename) {
-    qDebug() << "DEBUG: filename = " << filename;
-    QFile file(filename);
-
-    if (!file.exists()) {
-        qDebug()  << "ERROR: qWriteToEndFile pathStirng = " << path;
-        return -1;
-    }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return -1;
-    }
-
-    file.close();
-	return 0;
+bool File::isCurrentFileEmpty() {
+    std::ifstream file(this->path.c_str());
+    return file.peek() == std::ifstream::traits_type::eof();
 }
 
-int File::setPathToFile(QString src) {
-    if (cFileExists(src)) {
-        qDebug() << "ERROR: file with path not exist" << src;
-        return -1;
-    }
-    path = src;
-    return 0;
+int File::isFileExists(const std::string filename) {
+    std::ifstream file(filename.c_str());
+    return file.good() == true ? STATUS_SUCCESS : STATUS_FILE_NOT_FOUND;
 }
 
-int File::qWriteToEndFile(QString src) {
-    if (path.size() < 1) {
-        qDebug()  << "ERROR: qWriteToEndFile path == nullptr";
+int File::setPathToFile(std::string src) {
+    int retval = isFileExists(src);
+    if (retval == STATUS_FILE_NOT_FOUND) {
+        std::cout << LOG_ERROR << "setPathToFile file with this->path is not exist " << src << std::endl;
+        return STATUS_FILE_NOT_FOUND;
+    }
+    this->path = src;
+    return STATUS_SUCCESS;
+}
+
+int File::writeToEndFile(std::string &src) {
+    if (this->path.size() < 1) {
+        std::cout  << LOG_ERROR << "qwriteToEndFile this->path == nullptr";
         return -1;
     }
-
-    QFile file(path);
-    if (!file.exists()) {
-        qDebug()  << "ERROR: qWriteToEndFile pathStirng = " << path;
-        return -1;
-    }
-
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        qDebug()  << "ERROR: qWriteToEndFile pathStirng = " << path;
-        return -1;
-    }
-
-    QTextStream out(&file);
-    out.setCodec(CODEC);
-
+    std::ofstream out;
+    // std::ios::app is the open mode "append" meaning
+    // new data will be written to the end of the file.
+    out.open(this->path, std::ios::app);
     out << src;
-    file.close();
     return 0;
 }
 
-QString File::qReadFromFile() {
-    if (cFileExists(path)) {
-        qDebug() << "ERROR: file not exist";
-        return nullptr;
+int File::readFromFileByPosition(int pos, int size, std::string &output) {
+    int retval = isFileExists(this->path);
+    if (retval == STATUS_FILE_NOT_FOUND) {
+        std::cout << LOG_ERROR << "file with this->path is not exist " << this->path << std::endl;
+        return STATUS_FILE_NOT_FOUND;
     }
-    QFile file(path);
-
-    if (!file.exists()) {
-        qDebug()  << "ERROR: qWriteToEndFile pathStirng = " << path;
-        return nullptr;
+    std::ifstream file(this->path, std::ios::in|std::ios::ate);
+    char *memblock;
+    int filesize;
+    if(file.is_open()) {
+        filesize = file.tellg();
+        if (pos >= filesize) {
+            return STATUS_END_OF_FILE;
+        }
+        file.seekg(pos, std::ios::beg);
+        output.resize(size);
+        file.read(&output[0], size);
+    } else {
+        std::cout << LOG_DEBUG << "file is closed" << std::endl;
     }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return nullptr;
-    }
-    QString line;
-    while (!file.atEnd()) {
-        line += file.readLine();
-        qDebug() << "DEBUG: line = " << line.data();
-    }
-    file.close();
-
-    return line;
-}
-
-QString File::qReadFromFileByPosition(int pos, int size) {
-    if (cFileExists(path)) {
-        qDebug() << "ERROR: file not exist";
-        return nullptr;
-    }
-    QFile file(path);
-
-    if (!file.exists()) {
-        qDebug()  << "ERROR: qWriteToEndFile pathStirng = " << path;
-        return nullptr;
-    }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return nullptr;
-    }
-
-    QTextStream in(&file);
-    in.setCodec(CODEC);
-#ifdef UNICODE
-    pos *= 2; pos += 2;
-#endif
-    if (in.seek(pos + size) == false) {
-        qDebug()  << "ERROR: its end of file pos + size = " << pos + size;
-        return nullptr;
-    }
-
-    in.seek(pos);
-    QString line = in.readLine(size);
-
-    qDebug() << "qReadFromFileByPosition pos = " << pos << "line == " << line;
-
-    file.close();
-    return line;
+    return STATUS_SUCCESS;
 }

@@ -22,10 +22,10 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setCallbacks(void (*setFilename)(QString filename),
+    void setCallbacks(int (*setFilename)(QString *filename),
                       int (*performReadByDate)(QDate *date, QString *text),
                       int (*performReadAllDate)(QList<QDate *> *dateList),
-                      int (*performWriteToFile)(QString text));
+                      int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime));
 
     bool isCheckedCheckBoxCustomTime();
     QDateTime getCustomDateTime();
@@ -53,10 +53,10 @@ private:
     QTreeWidget *treeWidget = nullptr;
 
 // callbacks
-    void (*setFilenameHandler)(QString filename);
+    int (*setFilenameHandler)(QString *filename);
     int (*performReadByDateHandler)(QDate *date, QString *text);
     int (*performReadAllDateHandler)(QList<QDate *> *dateList);
-    int (*performWriteToFileHandler)(QString text);
+    int (*performWriteToFileHandler)(QString *text, bool isCustomTime, QDateTime *datetime);
 
 private slots:
     void readByTreeWidgetItem(QTreeWidgetItem *item);

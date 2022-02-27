@@ -1,23 +1,25 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include <QString>
+#include <string>
+
+// using namespace std;
 
 class Encoder
 {
 public:
-    QString encodeString(QString *src);
-    QString decodeString(QString *src);
+    // std::string encodeString(std::string *src);
+    // std::string decodeString(std::string *src);
 
-    QString encodeStringByKey(QString *src, QString *key);
-    QString decodeStringByKey(QString *src, QString *key);
+    std::string encodeStringByKey(std::string *src, std::string *key);
+    std::string decodeStringByKey(std::string *src, std::string *key);
 
-    // not recomended, unicode issue
-    int encodeString(char *src, char *dest);
-    int decodeString(char *src, char *dest);
+    // // not recomended, unicode issue
+    // int encodeString(char *src, char *dest);
+    // int decodeString(char *src, char *dest);
 
-    int encodeStringByKey(char *key, char *src, char *dest);
-    int decodeStringByKey(char *key, char *src, char *dest);
+    // int encodeStringByKey(char *key, char *src, char *dest);
+    // int decodeStringByKey(char *key, char *src, char *dest);
 };
 
 #endif // ENCODER_H

@@ -7,15 +7,17 @@
 // singleton class-helper for
 // read/convert datetime
 class DateTime {
-    static DateTime *datetime;
-    inline tm* getCurrentTM();
-
-    DateTime();
+    tm datetime;
 
 public:
-    static DateTime* getInstance();
+    DateTime();
+
+    void updateToCurrentDateTime();
+    void updateToCustomDateTime(tm *tm);
+
     std::string getCurrentDateString();
     std::string getCurrentDateTimeString();
+    std::string convertTmDateToString(tm *tm);
 };
 
 #endif // DATETIME_H

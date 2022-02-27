@@ -1,18 +1,16 @@
 #ifndef FILE_H
 #define FILE_H
 
-#include <QFile>
-
 class File
 {
 public:
-    int qWriteToEndFile(QString src);
-    QString qReadFromFile();
-    QString qReadFromFileByPosition(int pos, int size);
-    int setPathToFile(QString src);
+    bool isCurrentFileEmpty();
+    int writeToEndFile(std::string &src);
+    int readFromFileByPosition(int pos, int size, std::string &output);
+    int setPathToFile(std::string src);
 private:
-    QString path;
-    int cFileExists(const QString filename);
+    std::string path;
+    int isFileExists(const std::string filename);
 };
 
 #endif // FILE_H

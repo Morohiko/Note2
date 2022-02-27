@@ -27,8 +27,8 @@
 
 ## v2.0
 ### first lane e.g.
-_date.time_size_
-_2022/2/18.19:50_000030_
+date.time_size_
+2022/2/18.19:50_000030_
 
 ### create file
 check if file is empty(error if no)

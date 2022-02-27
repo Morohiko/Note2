@@ -1,24 +1,21 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <QString>
-#include <QDate>
+#include <string>
+#include <ctime>
 
 class Parser
 {
 public:
     Parser();
 
-    int parseHeadFromQString(QString *text, QDate *date, int *size);
-    int parseHeadFromQStringGetSize(QString *text, int *size);
-    int parseHeadFromQStringGetDateString(QString *text, QString *date);
-    int parseHeadFromQStringGetTimeString(QString *text, QString *time);
+    int parseHeadFromString(std::string &text, std::string &date, int &size);
+    int parseHeadFromStringGetSize(std::string &text, int &size);
+    int parseHeadFromStringGetDateString(std::string &text, std::string &date);
+    int parseHeadFromStringGetTimeString(std::string &text, std::string &time);
 
-    QString parseStringFromQDateTime(QDateTime *datetime);
-    QString parseStringFromQDate(QDate *date);
-    QString parseStringFromSize(int size);
-
-    QString generateHead(QDateTime *datetime, int size);
+    std::string generateHead(std::string &currentDateTime, int size);
+    std::string generateStringFromSize(int size);
 };
 
 #endif // PARSER_H

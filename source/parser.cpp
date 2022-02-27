@@ -1,82 +1,101 @@
+#include <cassert>
+#include <iostream>
+#include <stdexcept>
+
 #include "parser.h"
-
-#include <QDebug>
-
-#define DATEFORMAT "yyyy/MM/dd"
-#define DATETIMEFORMAT "yyyy/MM/dd.hh:mm"
+#include "config.h"
 
 Parser::Parser() {}
 
-// _date_time_size_, example format: _20190203095420_ <- _2019.02.03_09:54_20_
-int Parser::parseHeadFromQString(QString *text, QDate *date, int *size) {
-    Q_ASSERT(text); Q_ASSERT(date); Q_ASSERT(size);
-
-    QString dateString = text->left(10);
-
-    qDebug() << "DEBUG: leftString = " << dateString;
-
-    *date = QDate::fromString(dateString, DATEFORMAT);
-
+// 2022/2/19.23:32_000030
+int Parser::parseHeadFromString(std::string &text, std::string &date, int &size) {
     int retval = 0;
-    retval = parseHeadFromQStringGetSize(text, size);
-    qDebug() << "DEBUG: parseHead: year = " << date->year() << ", month = " << date->month() << ", day = " << date->day() << ", size = " << *size;
-
+    if (text.length() < SIZE_OF_HEADER) {
+        std::cout << "ERROR: cant parse head, string is corrupted: head = " << text << std::endl;
+        return STATUS_FAILURE;
+    }
+    retval = parseHeadFromStringGetDateString(text, date);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << "ERROR: cant parse head on get date step: head = " << text << std::endl;
+        return retval;
+    }
+    retval = parseHeadFromStringGetSize(text, size);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << "ERROR: cant parse head on get size step: head = " << text << std::endl;
+        return retval;
+    }
     return retval;
 }
 
-int Parser::parseHeadFromQStringGetDateString(QString *text, QString *date) {
-    Q_ASSERT(text); Q_ASSERT(date);
-    *date = text->left(10);
-    return 0;
-}
-
-int Parser::parseHeadFromQStringGetTimeString(QString *text, QString *time) {
-    Q_ASSERT(text); Q_ASSERT(time);
-    *time = text->left(16).right(5);
-    return 0;
-}
-
-int Parser::parseHeadFromQStringGetSize(QString *text, int *size) {
-    Q_ASSERT(text); Q_ASSERT(size);
-
-    int iter = 0;
-
-    QString sizeString = text->right(text->size() - 16 - 1);
-
-    QString sizea;
-    while (sizeString.length() > iter && sizeString.at(iter) != '_') {
-        sizea.append(sizeString.at(iter++));
+int Parser::parseHeadFromStringGetDateString(std::string &text, std::string &date) {
+    // 10 - size of date in header
+    if (text.length() < SIZE_OF_DATE ) {
+        std::cout << "ERROR: cant parse time from header: text = " << text <<
+        ", text.length = " << text.length() << std::endl;
+        return STATUS_FAILURE;
     }
-    bool isOk;
-    qDebug() << "DEBUG sizea = " << sizea;
-    *size = sizea.toInt(&isOk);
-
-    return isOk ? 0 : -1;
+    std::cout << LOG_DEBUG << "text  = " << text << std::endl;
+    date = text.substr(0, SIZE_OF_DATE);
+    return STATUS_SUCCESS;
 }
 
-QString Parser::parseStringFromQDate(QDate *date) {
-    Q_ASSERT(date);
-    return date->toString(DATEFORMAT);
+int Parser::parseHeadFromStringGetTimeString(std::string &text, std::string &time) {
+    // 15 - size of date and time in header
+    if (text.length() < 15) {
+        std::cout << "ERROR: cant parse time from header: text = " << text <<
+        ", text.length = " << text.length() << std::endl;
+        return STATUS_FAILURE;
+    }
+    time = text.substr(SIZE_OF_DATE + 1, SIZE_OF_TIME);
+    return STATUS_SUCCESS;
 }
 
-QString Parser::parseStringFromQDateTime(QDateTime *datetime) {
-    Q_ASSERT(datetime);
-    return datetime->toString(DATETIMEFORMAT);
+int Parser::parseHeadFromStringGetSize(std::string &text, int &size) {
+    int iter = 0;
+    if (text.length() < SIZE_OF_HEADER) {
+        std::cout << "ERROR: header was broken: " <<
+                    "text.size = " << text.size() << std::endl;
+        return STATUS_FAILURE;
+    }
+    std::string sizeString = text.substr(17, 6);
+    if (sizeString.length() != SIZE_OF_SIZE) {
+        std::cout << "ERROR: cant parse size from header: " <<
+            "sizeString.length() = " << sizeString.length() << 
+            ", sizeString = " << sizeString << std::endl;
+        return STATUS_FAILURE;
+    }
+    for (size_t i = 0; i < sizeString.length(); i++) {
+        try {
+            int tmp = std::stoi(sizeString.substr(i, i+1));
+        } catch(std::invalid_argument& e){
+            std::cout << "ERROR: cant parse size from header, corrupted data in header: " <<
+                "sizeString = " << sizeString << std::endl;
+            return STATUS_FAILURE;
+        }
+    }
+    try {
+        size = std::stoi(sizeString);
+    } catch(std::invalid_argument& e){
+        std::cout << "ERROR: cant parse size from header, corrupted data in header: " <<
+                "sizeString = " << sizeString << std::endl;
+        return STATUS_FAILURE;
+    }
+    return 0;
 }
 
-QString Parser::parseStringFromSize(int size) {
-    QString sizeBuff = QString::number(size);
+std::string Parser::generateStringFromSize(int size) {
+    std::string sizeBuff = std::to_string(size);
     while (sizeBuff.size() < 6) {
-        sizeBuff.push_front('0');
+        sizeBuff = "0" + sizeBuff;
     }
     return sizeBuff;
 }
 
-QString Parser::generateHead(QDateTime *datetime, int size) {
-    QString text;
-    text.append(parseStringFromQDateTime(datetime));
-    text.append('_');
-    text.append(parseStringFromSize(size));
-    text.append('_');
+std::string Parser::generateHead(std::string &currentDateTime, int size) {
+    std::string text;
+    text.append(currentDateTime);
+    text.append("_");
+    text.append(generateStringFromSize(size));
+    text.append("_");
     return text;
 }

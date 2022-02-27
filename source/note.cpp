@@ -1,46 +1,98 @@
-#include "note.h"
+#include <cassert>
+#include <iostream>
 
-#include <QDebug>
+#include "note.h"
 
 Note::Note() {
     note = this;
 }
 
-int Note::start() {
-    window.setCallbacks(setFilenameHandler, performReadByDateHandler,
-                        performReadAllDateHandler, performWriteToFileHandler);
-    window.show();
-    return 0;
-}
-
-void Note::setFilenameHandler(QString filename) {
-    Q_ASSERT(note);
-    return note->setFilename(filename);
+#ifdef USE_QT
+int Note::setFilenameHandler(QString *filename) {
+    std::string filename_std = filename->toStdString();
+    return note->setFilename(filename_std);
 }
 
 int Note::performReadByDateHandler(QDate *date, QString *text) {
-    Q_ASSERT(note);
-    return note->performReadByDate(date, text);
+    assert(note);
+    std::cout << LOG_DEBUG << std::endl;
+    tm date_tm;
+    date_tm.tm_year = date->year();
+    date_tm.tm_mon = date->month();
+    date_tm.tm_mday = date->day();
+    std::string text_std = text->toStdString();
+    int count = note->performReadByDate(&date_tm, &text_std);
+    *text = QString::fromStdString(text_std);
+    return 0;
 }
 
 int Note::performReadAllDateHandler(QList<QDate *> *dateList) {
-    Q_ASSERT(note);
+    assert(note);
+    std::cout << LOG_DEBUG << std::endl;
+    std::list<std::string> list;
+    int count = note->performReadAllDate(&list);
+    std::list<std::string>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it){
+        QString qstring = QString::fromStdString(*it);
+        QDate *qdate = new QDate(QDate::fromString(qstring, QString("yyyy/M/dd")));
+        dateList->append(qdate);
+    }
+    return count;
+}
+
+int Note::performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime *datetime) {
+    assert(note);
+    std::cout << LOG_DEBUG << std::endl;
+    std::string stdText = text->toStdString();
+    tm date_time_tm;
+    date_time_tm.tm_year = datetime->date().year();
+    date_time_tm.tm_mon = datetime->date().month();
+    date_time_tm.tm_mday = datetime->date().day();
+    date_time_tm.tm_hour = datetime->time().hour();
+    date_time_tm.tm_min = datetime->time().minute();
+    date_time_tm.tm_sec = datetime->time().second();
+    return note->performWriteToFile(stdText, isCustomTime, &date_time_tm);
+}
+#endif
+
+#ifdef USE_ANDROID
+// TODO: android api
+#endif
+
+#ifdef USE_DUMMY
+int Note::setFilenameHandler(std::string filename) {
+    assert(note);
+    return note->setFilename(filename);
+}
+
+int Note::performReadByDateHandler(tm *date, std::string *text) {
+    assert(note);
+    return note->performReadByDate(date, text);
+}
+
+int Note::performReadAllDateHandler(std::list<std::string> *dateList) {
+    assert(note);
     return note->performReadAllDate(dateList);
 }
 
-int Note::performWriteToFileHandler(QString text) {
-    Q_ASSERT(note);
-    return note->performWriteToFile(text);
+int Note::performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime) {
+    assert(note);
+    return note->performWriteToFile(*text, isCustomTime, datetime);
 }
+#endif
 
-void Note::setFilename(QString filename) {
-    file.setPathToFile(filename);
+int Note::setFilename(std::string filename) {
+    int retval = file.setPathToFile(filename);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << LOG_ERROR << "cant set filename: filename = " << filename << std::endl;
+    }
+    return retval;
 }
 
 #ifdef WITH_ENCODER
-QString Note::performEncodeString(QString *text) {
-    QString key = window.getKey();
-    QString dest;
+std::string Note::performEncodeString(std::string *text) {
+    std::string key = window.getKey();
+    std::string dest;
     dest.append(text);
     if (key.size() > 0) {
         dest = encoder.encodeStringByKey(&dest, &key);
@@ -48,9 +100,9 @@ QString Note::performEncodeString(QString *text) {
     return dest;
 }
 
-QString Note::performDecodeString(QString *text) {
-    QString key = window.getKey();
-    QString dest;
+std::string Note::performDecodeString(std::string *text) {
+    std::string key = window.getKey();
+    std::string dest;
     dest.append(text);
     if (key.size() > 0) {
         dest = encoder.decodeStringByKey(&dest, &key);
@@ -59,26 +111,23 @@ QString Note::performDecodeString(QString *text) {
 }
 #endif
 
-int Note::performWriteToFile(QString text) {
+int Note::performWriteToFile(std::string text, bool isCustomTime, tm* currentDateTime) {
     if (isValidKey() == false) {
-        qDebug() << "performWriteToFile isValidKey() == false";
-        return -1;
-    }
-    if (text.size() < 1) {
-        qDebug() << "ERROR: performWriteToFile: text is empty";
+        std::cout << LOG_ERROR << "performWriteToFile isValidKey() == false" << std::endl;
         return -1;
     }
 
-    QString finalText;
-    QDateTime datetime;
-    if (window.isCheckedCheckBoxCustomTime()) {
-        datetime = window.getCustomDateTime();
+    std::string finalText;
+
+    if (isCustomTime) {
+        datetime.updateToCustomDateTime(currentDateTime);
     } else {
-        datetime = QDateTime::currentDateTime();
+        datetime.updateToCurrentDateTime();
     }
 
     int size = SIZE_OF_HEADER + text.size();
-    QString head = parser.generateHead(&datetime, size);
+    std::string datetime_str = datetime.getCurrentDateTimeString();
+    std::string head = parser.generateHead(datetime_str, size);
 
 #ifdef WITH_ENCODER
     head = performEncodeString(&head);
@@ -90,8 +139,8 @@ int Note::performWriteToFile(QString text) {
 #endif
     finalText.append(text);
 
-    if (file.qWriteToEndFile(finalText)) {
-        qDebug() << "ERROR Cannot write to file";
+    if (file.writeToEndFile(finalText)) {
+        std::cout << LOG_ERROR << "Cannot write to file" << std::endl;
         return -1;
     }
 
@@ -99,23 +148,26 @@ int Note::performWriteToFile(QString text) {
 }
 
 // return position or negative value in case error
-int Note::findPositionByHeader(int pos, QString header) {
-    QString headerTmp;
+int Note::findPositionByHeader(int pos, std::string header) {
     int size = 0;
 
     do {
-        headerTmp = file.qReadFromFileByPosition(pos, SIZE_OF_HEADER);
+        std::string headerTmp;
+        int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_ERROR << "retval = " << retval << std::endl;
+            break;
+        }
 #ifdef WITH_ENCODER
         headerTmp = performDecodeString(&headerTmp);
 #endif
-        if (headerTmp == nullptr) {
-            qDebug() << "ERROR findPositionByHeader not found";
+        if (headerTmp.empty()) {
+            std::cout << LOG_ERROR << "not found" << std::endl;
             return -1;
         }
 
         if (header != headerTmp) {
-            parser.parseHeadFromQStringGetSize(&headerTmp, &size);
-            qDebug() << "DEBUG: size = " << size;
+            parser.parseHeadFromStringGetSize(headerTmp, size);
             pos += size;
         }
 
@@ -123,30 +175,42 @@ int Note::findPositionByHeader(int pos, QString header) {
             return pos;
         }
     } while (true);
+
+    // cant be reached there
+    return STATUS_SUCCESS;
 }
 
-// return position or negative value in case error
-int Note::findPositionByDate(int pos, QString date) {
-    QString headerTmp;
-    QString dateBuff;
+int Note::findPositionByDate(int pos, std::string date, int &returnPosition) {
+    std::string dateBuff;
     int size = 0;
 
     do {
-        headerTmp = file.qReadFromFileByPosition(pos, SIZE_OF_HEADER);
-#ifdef WITH_ENCODER
-        headerTmp = performDecodeString(&headerTmp);
-#endif
-        if (headerTmp == nullptr) {
-            qDebug() << "ERROR findPositionByDateheader not found";
+        std::string headerTmp;
+        int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_WARN << "cant file date: " << date << std::endl;
+            return retval;
+        }
+        if (retval == STATUS_FAILURE) {
+            std::cout << LOG_ERROR << "cant file posinion, date: " << date << std::endl;
+            return retval;
+        }
+        if (headerTmp.empty()) {
+            std::cout << LOG_ERROR << "not found" << std::endl;
             return -1;
         }
 
-        qDebug() << "DEBUG headerTmp = " << headerTmp;
-        parser.parseHeadFromQStringGetDateString(&headerTmp, &dateBuff);
+#ifdef WITH_ENCODER
+        headerTmp = performDecodeString(&headerTmp);
+#endif
 
-        qDebug() << "DEBUG: dateBuff = " << dateBuff << "date:" << date;
+        retval = parser.parseHeadFromStringGetDateString(headerTmp, dateBuff);
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_ERROR << "cant parse date from head, retval: " << retval << std::endl;
+        }
+
         if (date != dateBuff) {
-            parser.parseHeadFromQStringGetSize(&headerTmp, &size);
+            parser.parseHeadFromStringGetSize(headerTmp, size);
             pos += size;
         }
 
@@ -156,101 +220,132 @@ int Note::findPositionByDate(int pos, QString date) {
     } while (true);
 }
 
-// return body, nullptr in case error
-QString Note::performReadBodyByHead(QString head) {
+int Note::performReadBodyByHead(std::string head, std::string &ouptut) {
+    std::cout << LOG_DEBUG << "head = " << head << std::endl;
     int pos = 0;
     int size = 0;
 
     pos = findPositionByHeader(pos, head);
     if (pos < 0) {
-        qDebug() << "ERROR not found " << pos;
-        return nullptr;
+        std::cout << LOG_ERROR << "not found " << pos << std::endl;
+        return STATUS_FAILURE;
     }
 
-    parser.parseHeadFromQStringGetSize(&head, &size);
+    int stat = parser.parseHeadFromStringGetSize(head, size);
+    if (stat == -1) {
+        return STATUS_FAILURE;
+    }
 
     pos += SIZE_OF_HEADER;
     size -= SIZE_OF_HEADER;
 
-    QString text = file.qReadFromFileByPosition(pos, size);
-    qDebug() << "DEBUG: performReadBodyByHead text" <<text;
+    int retval = file.readFromFileByPosition(pos, size, ouptut);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << LOG_ERROR << "is not working" << std::endl;
+        return retval;
+    }
+
 #ifdef WITH_ENCODER
-    text = performDecodeString(&text);
+    ouptut = performDecodeString(&ouptut);
 #endif
-    return text;
+
+    return retval;
 }
 
 bool Note::isValidKey() {
-    QString buff;
+    std::string buff;
     int pos = 0; int size;
-    QDate date;
-    buff = file.qReadFromFileByPosition(pos, SIZE_OF_HEADER);
+    std::string date_str;
+    if (file.isCurrentFileEmpty()) {
+        std::cout << LOG_ERROR << "file is empty" << std::endl;
+        return true;
+    }
+    int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << LOG_ERROR << "isValidKey/readFromFileByPosition: retval = " << retval << std::endl;
+        return STATUS_FAILURE;
+    }
 #ifdef WITH_ENCODER
     buff = performDecodeString(&buff);
 #endif
-    if (buff == nullptr) {
-//        qDebug() << "DEBUG is new key ";
+    retval = parser.parseHeadFromString(buff, date_str, size);
+    if (retval == STATUS_END_OF_FILE) {
         return true;
-    }
-
-    if (parser.parseHeadFromQString(&buff, &date, &size)) {
-        qDebug() << "ERROR cannot parse qstring in performReadAllDatetime";
+    } else if (retval == 0) {
+        return true;
+    } else {
         return false;
     }
-    return true;
 }
 
 // return the number of successfully read datetime
-int Note::performReadAllDate(QList<QDate *> *dateList) {
-    Q_ASSERT(dateList);
+int Note::performReadAllDate(std::list<std::string> *dateList) {
+    assert(dateList);
 
     int pos = 0; int size = 0; int count = 0;
-    QString buff;
-    QDate date;
+    std::string buff;
+    std::string date;
+    int retval;
+    int state = 0;
 
     do {
-        buff = file.qReadFromFileByPosition(pos, SIZE_OF_HEADER);
+        buff.clear();
+        retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
+        if (retval == STATUS_END_OF_FILE) {
+            std::cout << LOG_WARN << "performReadAllDate end of file buff = " << buff << std::endl;
+            state = retval;
+            break;
+        }
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_ERROR << "performReadAllDate failure" << std::endl;
+        }
 #ifdef WITH_ENCODER
         buff = performDecodeString(&buff);
 #endif
-        if (buff == nullptr) {
+        retval = parser.parseHeadFromString(buff, date, size);
+        std::cout << LOG_DEBUG << "buf = " << buff << ", date = " << date << ", size = " << size << std::endl;
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_ERROR << "parser.parseHeadFromString retval = " << retval << std::endl;
             break;
         }
-
-        if (parser.parseHeadFromQString(&buff, &date, &size)) {
-            qDebug() << "ERROR cannot parse qstring in performReadAllDatetime";
-            break;
-        }
-
-        dateList->append(new QDate(date));
-
+        std::cout << LOG_DEBUG << "dateList push_back: date = " << date << std::endl;
+        dateList->push_back(date);
         pos += size;
         count++;
-    } while (true);
+    } while (state != STATUS_END_OF_FILE);
     return count;
 }
 
-int Note::performReadByDate(QDate *date, QString *text) {
-    Q_ASSERT(date); Q_ASSERT(text);
+int Note::performReadByDate(tm *date, std::string *text) {
+    assert(date); assert(text);
 
-    QString dateString = parser.parseStringFromQDate(date);
+    std::string dateString = datetime.convertTmDateToString(date);
 
-    int pos = 0; QString head; QString time; QString body;
+    int pos = 0;
+    int returnedPosition = 0;
+    std::string head;
+    std::string time;
+    std::string body;
     while (true) {
-        pos = findPositionByDate(pos, dateString);
-        qDebug() << "ERROR: pos = " << pos;
-
-        if (pos == -1) {
-            qDebug() << "ERROR: pos==-1";
+        int retval = findPositionByDate(pos, dateString, returnedPosition);
+        if (retval == STATUS_END_OF_FILE) {
+            std::cout << LOG_WARN << "End of file" << std::endl;
             break;
         }
-        qDebug() << "DEBUG: performReadByDateTime pos:" << pos;
-        head = file.qReadFromFileByPosition(pos, SIZE_OF_HEADER);
+        if (retval == STATUS_FAILURE) {
+            std::cout << LOG_ERROR << "failure on find position" << std::endl;
+        }
+        pos = returnedPosition;
+        retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
+        if (retval != STATUS_SUCCESS) {
+            std::cout << LOG_ERROR << "retval = " << retval << std::endl;
+            return retval;
+        }
 #ifdef WITH_ENCODER
         head = performDecodeString(&head);
 #endif
-        parser.parseHeadFromQStringGetTimeString(&head, &time);
-        body = performReadBodyByHead(head);
+        parser.parseHeadFromStringGetTimeString(head, time);
+        retval = performReadBodyByHead(head, body);
         (*text).append(time + '\n' + body + "\n\n");
         pos += body.size() + SIZE_OF_HEADER;
     }
