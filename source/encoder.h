@@ -9,8 +9,8 @@
 class Encoder
 {
 public:
-    std::string encodeStringByKey(std::string *src, std::string &key);
-    std::string decodeStringByKey(std::string *src, std::string &key);
+    std::string encodeStringByKey(std::string &src, std::string &key);
+    std::string decodeStringByKey(std::string &src, std::string &key);
 };
 
 #endif // ENCODER_H

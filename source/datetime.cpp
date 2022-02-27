@@ -17,12 +17,12 @@ inline void DateTime::updateToCurrentDateTime() {
     this->datetime.tm_mon = this->datetime.tm_mon + 1;
 }
 
-void DateTime::updateToCustomDateTime(tm *tm) {
-    this->datetime.tm_year = tm->tm_year;
-    this->datetime.tm_mon = tm->tm_mon;
-    this->datetime.tm_mday = tm->tm_mday;
-    this->datetime.tm_hour = tm->tm_hour;
-    this->datetime.tm_min = tm->tm_min;
+void DateTime::updateToCustomDateTime(tm &tm) {
+    this->datetime.tm_year = tm.tm_year;
+    this->datetime.tm_mon = tm.tm_mon;
+    this->datetime.tm_mday = tm.tm_mday;
+    this->datetime.tm_hour = tm.tm_hour;
+    this->datetime.tm_min = tm.tm_min;
 }
 
 // time format 2022/02/22
@@ -74,16 +74,16 @@ std::string DateTime::getCurrentDateTimeString() {
 }
 
 // time format 2022/02/22
-std::string DateTime::convertTmDateToString(tm *tm) {
-    std::string year = std::to_string(tm->tm_year);
+std::string DateTime::convertTmDateToString(tm &tm) {
+    std::string year = std::to_string(tm.tm_year);
     while (year.length() < 4) {
         year.insert(0, "0");
     }
-    std::string month = std::to_string(tm->tm_mon);
+    std::string month = std::to_string(tm.tm_mon);
     while (month.length() < 2) {
         month.insert(0, "0");
     }
-    std::string day = std::to_string(tm->tm_mday);
+    std::string day = std::to_string(tm.tm_mday);
     while (day.length() < 2) {
         day.insert(0, "0");
     }

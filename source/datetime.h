@@ -13,11 +13,11 @@ public:
     DateTime();
 
     void updateToCurrentDateTime();
-    void updateToCustomDateTime(tm *tm);
+    void updateToCustomDateTime(tm &tm);
 
     std::string getCurrentDateString();
     std::string getCurrentDateTimeString();
-    std::string convertTmDateToString(tm *tm);
+    std::string convertTmDateToString(tm &tm);
 };
 
 #endif // DATETIME_H

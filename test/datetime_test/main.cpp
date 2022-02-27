@@ -34,7 +34,7 @@ int testCustomDateDateTimeString() {
     tm.tm_hour = 12;
     tm.tm_min = 44;
 
-    datetime.updateToCustomDateTime(&tm);
+    datetime.updateToCustomDateTime(tm);
 
     expected_date = "2022/03/02";
     date = datetime.getCurrentDateString();

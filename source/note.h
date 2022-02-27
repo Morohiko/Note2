@@ -44,19 +44,19 @@ private:
     Parser parser;
     DateTime datetime;
 
-    int setFilename(std::string filename);
-    int performReadByDate(tm *date, std::string *text, std::string &key);
-    int performReadAllDate(std::list<std::string> *dateList, std::string &key);
-    int performWriteToFile(std::string &text, bool isCustomTime, tm* currentDateTime, std::string &key);
+    int setFilename(std::string &filename);
+    int performReadByDate(tm &date, std::string &text, std::string &key);
+    int performReadAllDate(std::list<std::string> &dateList, std::string &key);
+    int performWriteToFile(std::string &text, bool isCustomTime, tm& currentDateTime, std::string &key);
 
 #ifdef WITH_ENCODER
-    std::string performEncodeString(std::string *text, std::string &key);
-    std::string performDecodeString(std::string *text, std::string &key);
+    std::string performEncodeString(std::string &text, std::string &key);
+    std::string performDecodeString(std::string &text, std::string &key);
 #endif
 
     int findPositionByHeader(int pos, std::string &header, std::string &key);
-    int findPositionByDate(int pos, std::string date, int &returnedPosition, std::string &key);
-    int performReadBodyByHead(std::string head, std::string &body, std::string &key);
+    int findPositionByDate(int pos, std::string &date, int &returnedPosition, std::string &key);
+    int performReadBodyByHead(std::string &head, std::string &body, std::string &key);
 
     bool isValidKey(std::string &key);
 };
