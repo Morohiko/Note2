@@ -13,24 +13,26 @@ int Note::setFilenameHandler(QString *filename) {
     return note->setFilename(filename_std);
 }
 
-int Note::performReadByDateHandler(QDate *date, QString *text) {
+int Note::performReadByDateHandler(QDate *date, QString *text, QString *key) {
     assert(note);
     std::cout << LOG_DEBUG << std::endl;
     tm date_tm;
     date_tm.tm_year = date->year();
     date_tm.tm_mon = date->month();
     date_tm.tm_mday = date->day();
-    std::string text_std = text->toStdString();
-    int count = note->performReadByDate(&date_tm, &text_std);
-    *text = QString::fromStdString(text_std);
+    std::string textStd = text->toStdString();
+    std::string keyStd = key->toStdString();
+    int count = note->performReadByDate(&date_tm, &textStd, keyStd);
+    *text = QString::fromStdString(textStd);
     return 0;
 }
 
-int Note::performReadAllDateHandler(QList<QDate *> *dateList) {
-    assert(note);
+int Note::performReadAllDateHandler(QList<QDate *> *dateList, QString *key) {
+    assert(note); assert(dateList); assert(key);
     std::cout << LOG_DEBUG << std::endl;
     std::list<std::string> list;
-    int count = note->performReadAllDate(&list);
+    std::string stdKey = key->toStdString();
+    int count = note->performReadAllDate(&list, stdKey);
     std::list<std::string>::iterator it;
     for (it = list.begin(); it != list.end(); ++it){
         QString qstring = QString::fromStdString(*it);
@@ -40,10 +42,11 @@ int Note::performReadAllDateHandler(QList<QDate *> *dateList) {
     return count;
 }
 
-int Note::performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime *datetime) {
+int Note::performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime *datetime, QString *key) {
     assert(note);
     std::cout << LOG_DEBUG << std::endl;
     std::string stdText = text->toStdString();
+    std::string stdKey = key->toStdString();
     tm date_time_tm;
     date_time_tm.tm_year = datetime->date().year();
     date_time_tm.tm_mon = datetime->date().month();
@@ -51,7 +54,7 @@ int Note::performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime 
     date_time_tm.tm_hour = datetime->time().hour();
     date_time_tm.tm_min = datetime->time().minute();
     date_time_tm.tm_sec = datetime->time().second();
-    return note->performWriteToFile(stdText, isCustomTime, &date_time_tm);
+    return note->performWriteToFile(stdText, isCustomTime, &date_time_tm, stdKey);
 }
 #endif
 
@@ -65,19 +68,21 @@ int Note::setFilenameHandler(std::string filename) {
     return note->setFilename(filename);
 }
 
-int Note::performReadByDateHandler(tm *date, std::string *text) {
-    assert(note);
-    return note->performReadByDate(date, text);
+int Note::performReadByDateHandler(tm *date, std::string *text, std::string *key) {
+    assert(note); assert(date);
+    assert(text); assert(key);
+    return note->performReadByDate(date, text, *key);
 }
 
-int Note::performReadAllDateHandler(std::list<std::string> *dateList) {
-    assert(note);
-    return note->performReadAllDate(dateList);
+int Note::performReadAllDateHandler(std::list<std::string> *dateList, std::string *key) {
+    assert(note); assert(dateList); assert(key);
+    return note->performReadAllDate(dateList, *key);
 }
 
-int Note::performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime) {
-    assert(note);
-    return note->performWriteToFile(*text, isCustomTime, datetime);
+int Note::performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime, std::string *key) {
+    assert(note); assert(text);
+    assert(datetime); assert(key);
+    return note->performWriteToFile(*text, isCustomTime, datetime, *key);
 }
 #endif
 
@@ -90,29 +95,29 @@ int Note::setFilename(std::string filename) {
 }
 
 #ifdef WITH_ENCODER
-std::string Note::performEncodeString(std::string *text) {
-    std::string key = window.getKey();
+std::string Note::performEncodeString(std::string *text, std::string &key) {
+    // std::string key = window.getKey();
     std::string dest;
-    dest.append(text);
     if (key.size() > 0) {
-        dest = encoder.encodeStringByKey(&dest, &key);
+        dest = encoder.encodeStringByKey(text, key);
+        return dest;
     }
-    return dest;
+    return *text;
 }
 
-std::string Note::performDecodeString(std::string *text) {
-    std::string key = window.getKey();
+std::string Note::performDecodeString(std::string *text, std::string &key) {
+    assert(text);
     std::string dest;
-    dest.append(text);
     if (key.size() > 0) {
-        dest = encoder.decodeStringByKey(&dest, &key);
+        dest = encoder.decodeStringByKey(text, key);
+        return dest;
     }
-    return dest;
+    return *text;
 }
 #endif
 
-int Note::performWriteToFile(std::string text, bool isCustomTime, tm* currentDateTime) {
-    if (isValidKey() == false) {
+int Note::performWriteToFile(std::string &text, bool isCustomTime, tm* currentDateTime, std::string &key) {
+    if (isValidKey(key) == false) {
         std::cout << LOG_ERROR << "performWriteToFile isValidKey() == false" << std::endl;
         return -1;
     }
@@ -130,12 +135,12 @@ int Note::performWriteToFile(std::string text, bool isCustomTime, tm* currentDat
     std::string head = parser.generateHead(datetime_str, size);
 
 #ifdef WITH_ENCODER
-    head = performEncodeString(&head);
+    head = performEncodeString(&head, key);
 #endif
     finalText.append(head);
 
 #ifdef WITH_ENCODER
-    text = performEncodeString(&text);
+    text = performEncodeString(&text, key);
 #endif
     finalText.append(text);
 
@@ -148,7 +153,7 @@ int Note::performWriteToFile(std::string text, bool isCustomTime, tm* currentDat
 }
 
 // return position or negative value in case error
-int Note::findPositionByHeader(int pos, std::string header) {
+int Note::findPositionByHeader(int pos, std::string &header, std::string &key) {
     int size = 0;
 
     do {
@@ -159,7 +164,7 @@ int Note::findPositionByHeader(int pos, std::string header) {
             break;
         }
 #ifdef WITH_ENCODER
-        headerTmp = performDecodeString(&headerTmp);
+        headerTmp = performDecodeString(&headerTmp, key);
 #endif
         if (headerTmp.empty()) {
             std::cout << LOG_ERROR << "not found" << std::endl;
@@ -180,7 +185,7 @@ int Note::findPositionByHeader(int pos, std::string header) {
     return STATUS_SUCCESS;
 }
 
-int Note::findPositionByDate(int pos, std::string date, int &returnPosition) {
+int Note::findPositionByDate(int pos, std::string date, int &returnPosition, std::string &key) {
     std::string dateBuff;
     int size = 0;
 
@@ -201,7 +206,7 @@ int Note::findPositionByDate(int pos, std::string date, int &returnPosition) {
         }
 
 #ifdef WITH_ENCODER
-        headerTmp = performDecodeString(&headerTmp);
+        headerTmp = performDecodeString(&headerTmp, key);
 #endif
 
         retval = parser.parseHeadFromStringGetDateString(headerTmp, dateBuff);
@@ -220,12 +225,12 @@ int Note::findPositionByDate(int pos, std::string date, int &returnPosition) {
     } while (true);
 }
 
-int Note::performReadBodyByHead(std::string head, std::string &ouptut) {
+int Note::performReadBodyByHead(std::string head, std::string &ouptut, std::string &key) {
     std::cout << LOG_DEBUG << "head = " << head << std::endl;
     int pos = 0;
     int size = 0;
 
-    pos = findPositionByHeader(pos, head);
+    pos = findPositionByHeader(pos, head, key);
     if (pos < 0) {
         std::cout << LOG_ERROR << "not found " << pos << std::endl;
         return STATUS_FAILURE;
@@ -246,13 +251,13 @@ int Note::performReadBodyByHead(std::string head, std::string &ouptut) {
     }
 
 #ifdef WITH_ENCODER
-    ouptut = performDecodeString(&ouptut);
+    ouptut = performDecodeString(&ouptut, key);
 #endif
 
     return retval;
 }
 
-bool Note::isValidKey() {
+bool Note::isValidKey(std::string &key) {
     std::string buff;
     int pos = 0; int size;
     std::string date_str;
@@ -265,8 +270,10 @@ bool Note::isValidKey() {
         std::cout << LOG_ERROR << "isValidKey/readFromFileByPosition: retval = " << retval << std::endl;
         return STATUS_FAILURE;
     }
+    std::cout << LOG_ERROR << "buff.length = " << buff.length() << ", buff = " << buff << std::endl;
+
 #ifdef WITH_ENCODER
-    buff = performDecodeString(&buff);
+    buff = performDecodeString(&buff, key);
 #endif
     retval = parser.parseHeadFromString(buff, date_str, size);
     if (retval == STATUS_END_OF_FILE) {
@@ -279,7 +286,7 @@ bool Note::isValidKey() {
 }
 
 // return the number of successfully read datetime
-int Note::performReadAllDate(std::list<std::string> *dateList) {
+int Note::performReadAllDate(std::list<std::string> *dateList, std::string &key) {
     assert(dateList);
 
     int pos = 0; int size = 0; int count = 0;
@@ -300,7 +307,7 @@ int Note::performReadAllDate(std::list<std::string> *dateList) {
             std::cout << LOG_ERROR << "performReadAllDate failure" << std::endl;
         }
 #ifdef WITH_ENCODER
-        buff = performDecodeString(&buff);
+        buff = performDecodeString(&buff, key);
 #endif
         retval = parser.parseHeadFromString(buff, date, size);
         std::cout << LOG_DEBUG << "buf = " << buff << ", date = " << date << ", size = " << size << std::endl;
@@ -316,7 +323,7 @@ int Note::performReadAllDate(std::list<std::string> *dateList) {
     return count;
 }
 
-int Note::performReadByDate(tm *date, std::string *text) {
+int Note::performReadByDate(tm *date, std::string *text, std::string &key) {
     assert(date); assert(text);
 
     std::string dateString = datetime.convertTmDateToString(date);
@@ -327,7 +334,7 @@ int Note::performReadByDate(tm *date, std::string *text) {
     std::string time;
     std::string body;
     while (true) {
-        int retval = findPositionByDate(pos, dateString, returnedPosition);
+        int retval = findPositionByDate(pos, dateString, returnedPosition, key);
         if (retval == STATUS_END_OF_FILE) {
             std::cout << LOG_WARN << "End of file" << std::endl;
             break;
@@ -342,10 +349,10 @@ int Note::performReadByDate(tm *date, std::string *text) {
             return retval;
         }
 #ifdef WITH_ENCODER
-        head = performDecodeString(&head);
+        head = performDecodeString(&head, key);
 #endif
         parser.parseHeadFromStringGetTimeString(head, time);
-        retval = performReadBodyByHead(head, body);
+        retval = performReadBodyByHead(head, body, key);
         (*text).append(time + '\n' + body + "\n\n");
         pos += body.size() + SIZE_OF_HEADER;
     }

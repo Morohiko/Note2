@@ -10,6 +10,7 @@ Parser::Parser() {}
 // 2022/2/19.23:32_000030
 int Parser::parseHeadFromString(std::string &text, std::string &date, int &size) {
     int retval = 0;
+    std::cout << LOG_ERROR << "text = " << text << std::endl;
     if (text.length() < SIZE_OF_HEADER) {
         std::cout << "ERROR: cant parse head, string is corrupted: head = " << text << std::endl;
         return STATUS_FAILURE;

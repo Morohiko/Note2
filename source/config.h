@@ -9,7 +9,7 @@
 #define SIZE_OF_TIME 5
 #define SIZE_OF_DATETIME SIZE_OF_DATE + SIZE_OF_TIME + 1
 #define SIZE_OF_SIZE 6
-// #define WITH_ENCODER
+#define WITH_ENCODER
 
 #define UNICODE
 #ifdef UNICODE

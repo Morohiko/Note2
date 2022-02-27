@@ -23,9 +23,9 @@ public:
     ~MainWindow();
 
     void setCallbacks(int (*setFilename)(QString *filename),
-                      int (*performReadByDate)(QDate *date, QString *text),
-                      int (*performReadAllDate)(QList<QDate *> *dateList),
-                      int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime));
+                      int (*performReadByDate)(QDate *date, QString *text, QString *key),
+                      int (*performReadAllDate)(QList<QDate *> *dateList, QString *key),
+                      int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime, QString *key));
 
     bool isCheckedCheckBoxCustomTime();
     QDateTime getCustomDateTime();
@@ -54,9 +54,9 @@ private:
 
 // callbacks
     int (*setFilenameHandler)(QString *filename);
-    int (*performReadByDateHandler)(QDate *date, QString *text);
-    int (*performReadAllDateHandler)(QList<QDate *> *dateList);
-    int (*performWriteToFileHandler)(QString *text, bool isCustomTime, QDateTime *datetime);
+    int (*performReadByDateHandler)(QDate *date, QString *text, QString *key);
+    int (*performReadAllDateHandler)(QList<QDate *> *dateList, QString *key);
+    int (*performWriteToFileHandler)(QString *text, bool isCustomTime, QDateTime *datetime, QString *key);
 
 private slots:
     void readByTreeWidgetItem(QTreeWidgetItem *item);

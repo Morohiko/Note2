@@ -42,6 +42,14 @@ int testWriteReadFile(std::string &filepath) {
 
 int main() {
     std::string filepath = "/home/user/work/Note2/test/file_test/testfile.txt";
-    testWriteReadFile(filepath);
-    std::cout << "hello" << std::endl;
+    int retval;
+    bool isPassed = true;
+
+    retval = testWriteReadFile(filepath);
+    if (retval != STATUS_SUCCESS) {
+        std::cout << "file_test: testWriteReadFile failed" << std::endl;
+        isPassed = false;
+    }
+
+    std::cout << "file_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
 }

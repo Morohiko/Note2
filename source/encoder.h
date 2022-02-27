@@ -2,24 +2,15 @@
 #define ENCODER_H
 
 #include <string>
+#include "config.h"
 
 // using namespace std;
 
 class Encoder
 {
 public:
-    // std::string encodeString(std::string *src);
-    // std::string decodeString(std::string *src);
-
-    std::string encodeStringByKey(std::string *src, std::string *key);
-    std::string decodeStringByKey(std::string *src, std::string *key);
-
-    // // not recomended, unicode issue
-    // int encodeString(char *src, char *dest);
-    // int decodeString(char *src, char *dest);
-
-    // int encodeStringByKey(char *key, char *src, char *dest);
-    // int decodeStringByKey(char *key, char *src, char *dest);
+    std::string encodeStringByKey(std::string *src, std::string &key);
+    std::string decodeStringByKey(std::string *src, std::string &key);
 };
 
 #endif // ENCODER_H

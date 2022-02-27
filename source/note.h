@@ -21,9 +21,9 @@ public:
     // int start();
 #ifdef USE_QT
     static int setFilenameHandler(QString *filename);
-    static int performReadByDateHandler(QDate *date, QString *text);
-    static int performReadAllDateHandler(QList<QDate *> *dateList);
-    static int performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime *datetime);
+    static int performReadByDateHandler(QDate *date, QString *text, QString *key);
+    static int performReadAllDateHandler(QList<QDate *> *dateList, QString *key);
+    static int performWriteToFileHandler(QString *text, bool isCustomTime, QDateTime *datetime, QString *key);
 #endif
 
 #ifdef USE_ANDROID
@@ -32,9 +32,9 @@ public:
 
 #ifdef USE_DUMMY
     static int setFilenameHandler(std::string filename);
-    static int performReadByDateHandler(tm *date, std::string *text);
-    static int performReadAllDateHandler(std::list<std::string> *dateList);
-    static int performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime);
+    static int performReadByDateHandler(tm *date, std::string *text, std::string *key);
+    static int performReadAllDateHandler(std::list<std::string> *dateList, std::string *key);
+    static int performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime, std::string *key);
 #endif
 
 private:
@@ -45,20 +45,20 @@ private:
     DateTime datetime;
 
     int setFilename(std::string filename);
-    int performReadByDate(tm *date, std::string *text);
-    int performReadAllDate(std::list<std::string> *dateList);
-    int performWriteToFile(std::string text, bool isCustomTime, tm* currentDateTime);
+    int performReadByDate(tm *date, std::string *text, std::string &key);
+    int performReadAllDate(std::list<std::string> *dateList, std::string &key);
+    int performWriteToFile(std::string &text, bool isCustomTime, tm* currentDateTime, std::string &key);
 
 #ifdef WITH_ENCODER
-    std::string performEncodeString(std::string *text);
-    std::string performDecodeString(std::string *text);
+    std::string performEncodeString(std::string *text, std::string &key);
+    std::string performDecodeString(std::string *text, std::string &key);
 #endif
 
-    int findPositionByHeader(int pos, std::string header);
-    int findPositionByDate(int pos, std::string date, int &returnedPosition);
-    int performReadBodyByHead(std::string head, std::string &body);
+    int findPositionByHeader(int pos, std::string &header, std::string &key);
+    int findPositionByDate(int pos, std::string date, int &returnedPosition, std::string &key);
+    int performReadBodyByHead(std::string head, std::string &body, std::string &key);
 
-    bool isValidKey();
+    bool isValidKey(std::string &key);
 };
 
 #endif // NOTE_H

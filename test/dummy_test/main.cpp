@@ -42,7 +42,8 @@ int testPerformReadByDateHandler(Dummy &dummy) {
     tm.tm_year = 2022;
     tm.tm_mon = 2;
     tm.tm_mday = 19;
-    retval = dummy.performReadByDateHandler(&tm, &text);
+    std::string key;
+    retval = dummy.performReadByDateHandler(&tm, &text, &key);
     expected_text = "23:32\n123123\n\n";
     if (expected_text.compare(text) != 0) {
         return STATUS_TEST_FAILED;
@@ -63,8 +64,8 @@ int testPerformReadAllDateHandle(Dummy &dummy) {
     expectedList.push_back("2022/02/19");
     expectedList.push_back("2020/03/24");
     std::list<std::string> dateList;
-    retval = dummy.performReadAllDateHandler(&dateList);
-    std::cout << "retval = " << retval;
+    std::string key;
+    retval = dummy.performReadAllDateHandler(&dateList, &key);
     if (retval != 2) {
         std::cout << "return must be count of read data" << std::endl;
         return STATUS_TEST_FAILED;

@@ -50,7 +50,8 @@ void MainWindow::slotForWriteButton() {
     QString text = textEdit->toPlainText();
     bool isCheckBox = this->isCheckedCheckBoxCustomTime();
     QDateTime datetime = this->getCustomDateTime();
-    int stat = performWriteToFileHandler(&text, isCheckBox, &datetime);
+    QString key = getKey();
+    int stat = performWriteToFileHandler(&text, isCheckBox, &datetime, &key);
     if (stat) {
         setColorForPushButton(btnWrite, QColor(Qt::red));
     } else {
@@ -82,7 +83,8 @@ void MainWindow::readByTreeWidgetItem(QTreeWidgetItem *item) {
     qDebug() << "installConnect item->text = year:" << year << "month:" << month << "day:" << day;
     QDate date(year, month, day);
     QString text;
-    performReadByDateHandler(&date, &text);
+    QString key = getKey();
+    performReadByDateHandler(&date, &text, &key);
     textEdit->clear();
     textEdit->setText(text);
 }
@@ -94,8 +96,9 @@ void MainWindow::expandedTreeWidgetItem(QTreeWidgetItem *item) {
 
 void MainWindow::slotForReadButton() {
     QList<QDate *> dateList;
+    QString key = getKey();
 
-    if (performReadAllDateHandler(&dateList) > 0) {
+    if (performReadAllDateHandler(&dateList, &key) > 0) {
         setColorForPushButton(btnRead, QColor(Qt::green));
         qDebug() << "DEBUG performReadAllDatetime is good";
     } else {
@@ -144,9 +147,9 @@ void MainWindow::setColorForPushButton(QPushButton *btn, QColor color) {
 }
 
 void MainWindow::setCallbacks(int (*setFilename)(QString *filename),
-                              int (*performReadByDate)(QDate *date, QString *text),
-                              int (*performReadAllDate)(QList<QDate *> *dateList),
-                              int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime)) {
+                              int (*performReadByDate)(QDate *date, QString *text, QString *key),
+                              int (*performReadAllDate)(QList<QDate *> *dateList, QString *key),
+                              int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime, QString *key)) {
     setFilenameHandler = setFilename;
     performReadByDateHandler = performReadByDate;
     performReadAllDateHandler = performReadAllDate;
