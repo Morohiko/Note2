@@ -26,68 +26,71 @@ void DateTime::updateToCustomDateTime(tm &tm) {
 }
 
 // time format 2022/02/22
-std::string DateTime::getCurrentDateString() {
-    std::string year = std::to_string(this->datetime.tm_year);
+std::wstring DateTime::getCurrentDateString() {
+    std::wstring year = std::to_wstring(this->datetime.tm_year);
     while (year.length() < 4) {
-        year.insert(0, "0");
+        year.insert(0, L"0");
     }
-    std::string month = std::to_string(this->datetime.tm_mon);
+    std::wstring month = std::to_wstring(this->datetime.tm_mon);
     while (month.length() < 2) {
-        month.insert(0, "0");
+        month.insert(0, L"0");
     }
-    std::string day = std::to_string(this->datetime.tm_mday);
+    std::wstring day = std::to_wstring(this->datetime.tm_mday);
     while (day.length() < 2) {
-        day.insert(0, "0");
+        day.insert(0, L"0");
     }
 
-    std::ostringstream oss;
-    oss << year << "/" << month << "/" << day;
+    // std::ostringstream oss;
+    std::wstringstream oss;
+    oss << year << L"/" << month << L"/" << day;
     return oss.str();
 }
 
 // datetime format 2022/02/22.20:02
-std::string DateTime::getCurrentDateTimeString() {
-    std::string year = std::to_string(this->datetime.tm_year);
+std::wstring DateTime::getCurrentDateTimeString() {
+    std::wstring year = std::to_wstring(this->datetime.tm_year);
     while (year.length() < 4) {
-        year.insert(0, "0");
+        year.insert(0, L"0");
     }
-    std::string month = std::to_string(this->datetime.tm_mon);
+    std::wstring month = std::to_wstring(this->datetime.tm_mon);
     while (month.length() < 2) {
-        month.insert(0, "0");
+        month.insert(0, L"0");
     }
-    std::string day = std::to_string(this->datetime.tm_mday);
+    std::wstring day = std::to_wstring(this->datetime.tm_mday);
     while (day.length() < 2) {
-        day.insert(0, "0");
+        day.insert(0, L"0");
     }
-    std::string hour = std::to_string(this->datetime.tm_hour);
+    std::wstring hour = std::to_wstring(this->datetime.tm_hour);
     while (hour.length() < 2) {
-        hour.insert(0, "0");
+        hour.insert(0, L"0");
     }
-    std::string min = std::to_string(this->datetime.tm_min);
+    std::wstring min = std::to_wstring(this->datetime.tm_min);
     while (min.length() < 2) {
-        min.insert(0, "0");
+        min.insert(0, L"0");
     }
-    std::ostringstream oss;
+    std::wstringstream oss;
+    // std::ostringstream oss;
     oss << year << "/" << month << "/" << day << "." <<
            hour << ":" << min;
     return oss.str();
 }
 
 // time format 2022/02/22
-std::string DateTime::convertTmDateToString(tm &tm) {
-    std::string year = std::to_string(tm.tm_year);
+std::wstring DateTime::convertTmDateToString(tm &tm) {
+    std::wstring year = std::to_wstring(tm.tm_year);
     while (year.length() < 4) {
-        year.insert(0, "0");
+        year.insert(0, L"0");
     }
-    std::string month = std::to_string(tm.tm_mon);
+    std::wstring month = std::to_wstring(tm.tm_mon);
     while (month.length() < 2) {
-        month.insert(0, "0");
+        month.insert(0, L"0");
     }
-    std::string day = std::to_string(tm.tm_mday);
+    std::wstring day = std::to_wstring(tm.tm_mday);
     while (day.length() < 2) {
-        day.insert(0, "0");
+        day.insert(0, L"0");
     }
-    std::ostringstream oss;
-    oss << year << "/" << month << "/" << day;
+    // std::ostringstream oss;
+    std::wstringstream oss;
+    oss << year << L"/" << month << L"/" << day;
     return oss.str();
 }

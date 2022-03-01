@@ -5,7 +5,7 @@
 #include "config.h"
 
 int testCurrentDateDateTimeString() {
-    std::string text;
+    std::wstring text;
     DateTime datetime;
 
     datetime.updateToCurrentDateTime();
@@ -16,7 +16,7 @@ int testCurrentDateDateTimeString() {
     }
 
     text = datetime.getCurrentDateTimeString();
-    std::cout << "getCurrentDateTimeString: text = " << text << std::endl;
+    std::wcout << "getCurrentDateTimeString: text = " << text << std::endl;
 
     if (text.length() != SIZE_OF_DATETIME) {
         return STATUS_TEST_FAILED;
@@ -25,7 +25,7 @@ int testCurrentDateDateTimeString() {
 }
 
 int testCustomDateDateTimeString() {
-    std::string date, expected_date;
+    std::wstring date, expected_date;
     DateTime datetime;
     tm tm;
     tm.tm_year = 2022;
@@ -36,14 +36,14 @@ int testCustomDateDateTimeString() {
 
     datetime.updateToCustomDateTime(tm);
 
-    expected_date = "2022/03/02";
+    expected_date = L"2022/03/02";
     date = datetime.getCurrentDateString();
     if (date.length() != SIZE_OF_DATE ||
         date.compare(expected_date) != 0) {
         return STATUS_TEST_FAILED;
     }
 
-    expected_date = "2022/03/02.12:44";
+    expected_date = L"2022/03/02.12:44";
     date = datetime.getCurrentDateTimeString();
     if (date.length() != SIZE_OF_DATETIME ||
         date.compare(expected_date) != 0) {
@@ -58,16 +58,16 @@ int main() {
 
     retval = testCurrentDateDateTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::cout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
+        std::wcout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
         isPassed = false;
     }
 
     retval = testCustomDateDateTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::cout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
+        std::wcout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
         isPassed = false;
     }
 
-    std::cout << "datetime_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    std::wcout << "datetime_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
     return 0;
 }

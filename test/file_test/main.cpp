@@ -9,12 +9,12 @@
 
 // **************** help functions ******************* //
 bool isFileExists(std::string &name) {
-    std::ifstream f(name.c_str());
+    std::wifstream f(name.c_str());
     return f.good();
 }
 
 int createFile(std::string &name) {
-    std::ofstream MyFile(name);
+    std::wofstream MyFile(name);
     MyFile.close();
     return 0;
 }
@@ -29,13 +29,13 @@ int testWriteReadFile(std::string &filepath) {
 
     File file;
     file.setPathToFile(filepath);
-    std::string test_text = "test_text";
+    std::wstring test_text = L"test_text";
     file.writeToEndFile(test_text);
     file.writeToEndFile(test_text);
     for (int i = 0; i < 40; i+=5) {
-        std::string output;
+        std::wstring output;
         int retval = file.readFromFileByPosition(i, 5, output);
-        std::cout << "output = " << output << ", retval = " << retval << std::endl;
+        std::wcout << "output = " << output << ", retval = " << retval << std::endl;
     }
     return STATUS_SUCCESS;
 }
@@ -47,9 +47,9 @@ int main() {
 
     retval = testWriteReadFile(filepath);
     if (retval != STATUS_SUCCESS) {
-        std::cout << "file_test: testWriteReadFile failed" << std::endl;
+        std::wcout << "file_test: testWriteReadFile failed" << std::endl;
         isPassed = false;
     }
 
-    std::cout << "file_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    std::wcout << "file_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
 }

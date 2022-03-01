@@ -1,10 +1,10 @@
 #include "dummy.h"
 #include <iostream>
 
-void Dummy::setCallbacks(int (*setFilename)(std::string filename),
-                         int (*performReadByDate)(tm *date, std::string *text, std::string *key),
-                         int (*performReadAllDate)(std::list<std::string> *dateList, std::string *key),
-                         int (*performWriteToFile)(std::string *text, bool isCustomTime, tm *datetime, std::string *key)) {
+void Dummy::setCallbacks(int (*setFilename)(std::string *filename),
+                         int (*performReadByDate)(tm *date, std::wstring *text, std::wstring *key),
+                         int (*performReadAllDate)(std::list<std::wstring> *dateList, std::wstring *key),
+                         int (*performWriteToFile)(std::wstring *text, bool isCustomTime, tm *datetime, std::wstring *key)) {
     setFilenameHandler = setFilename;
     performReadByDateHandler = performReadByDate;
     performReadAllDateHandler = performReadAllDate;

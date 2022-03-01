@@ -9,13 +9,13 @@ class Parser
 public:
     Parser();
 
-    int parseHeadFromString(std::string &text, std::string &date, int &size);
-    int parseHeadFromStringGetSize(std::string &text, int &size);
-    int parseHeadFromStringGetDateString(std::string &text, std::string &date);
-    int parseHeadFromStringGetTimeString(std::string &text, std::string &time);
+    int parseHeadFromString(std::wstring &text, std::wstring &date, int &size);
+    int parseHeadFromStringGetSize(std::wstring &text, int &size);
+    int parseHeadFromStringGetDateString(std::wstring &text, std::wstring &date);
+    int parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &time);
 
-    std::string generateHead(std::string &currentDateTime, int size);
-    std::string generateStringFromSize(int size);
+    std::wstring generateHead(std::wstring &currentDateTime, int size);
+    std::wstring generateStringFromSize(int size);
 };
 
 #endif // PARSER_H

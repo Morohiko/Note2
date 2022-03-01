@@ -31,10 +31,10 @@ public:
 #endif
 
 #ifdef USE_DUMMY
-    static int setFilenameHandler(std::string filename);
-    static int performReadByDateHandler(tm *date, std::string *text, std::string *key);
-    static int performReadAllDateHandler(std::list<std::string> *dateList, std::string *key);
-    static int performWriteToFileHandler(std::string *text, bool isCustomTime, tm *datetime, std::string *key);
+    static int setFilenameHandler(std::string *filename);
+    static int performReadByDateHandler(tm *date, std::wstring *text, std::wstring *key);
+    static int performReadAllDateHandler(std::list<std::wstring> *dateList, std::wstring *key);
+    static int performWriteToFileHandler(std::wstring *text, bool isCustomTime, tm *datetime, std::wstring *key);
 #endif
 
 private:
@@ -45,20 +45,20 @@ private:
     DateTime datetime;
 
     int setFilename(std::string &filename);
-    int performReadByDate(tm &date, std::string &text, std::string &key);
-    int performReadAllDate(std::list<std::string> &dateList, std::string &key);
-    int performWriteToFile(std::string &text, bool isCustomTime, tm& currentDateTime, std::string &key);
+    int performReadByDate(tm &date, std::wstring &text, std::wstring &key);
+    int performReadAllDate(std::list<std::wstring> &dateList, std::wstring &key);
+    int performWriteToFile(std::wstring &text, bool isCustomTime, tm& currentDateTime, std::wstring &key);
 
 #ifdef WITH_ENCODER
-    std::string performEncodeString(std::string &text, std::string &key);
-    std::string performDecodeString(std::string &text, std::string &key);
+    std::wstring performEncodeString(std::wstring &text, std::wstring &key);
+    std::wstring performDecodeString(std::wstring &text, std::wstring &key);
 #endif
 
-    int findPositionByHeader(int pos, std::string &header, std::string &key);
-    int findPositionByDate(int pos, std::string &date, int &returnedPosition, std::string &key);
-    int performReadBodyByHead(std::string &head, std::string &body, std::string &key);
+    int findPositionByHeader(int pos, std::wstring &header, std::wstring &key);
+    int findPositionByDate(int pos, std::wstring &date, int &returnedPosition, std::wstring &key);
+    int performReadBodyByHead(std::wstring &head, std::wstring &body, std::wstring &key);
 
-    bool isValidKey(std::string &key);
+    bool isValidKey(std::wstring &key);
 };
 
 #endif // NOTE_H

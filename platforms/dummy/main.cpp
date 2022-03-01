@@ -8,6 +8,6 @@ int main() {
     Dummy dummy;
     dummy.setCallbacks(Note::setFilenameHandler, Note::performReadByDateHandler,
                        Note::performReadAllDateHandler, Note::performWriteToFileHandler);
-    std::cout << LOG_INFO << "hello from dummy" << std::endl;
+    std::wcout << LOG_INFO << "hello from dummy" << std::endl;
     return 0;
 }

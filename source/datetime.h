@@ -15,9 +15,9 @@ public:
     void updateToCurrentDateTime();
     void updateToCustomDateTime(tm &tm);
 
-    std::string getCurrentDateString();
-    std::string getCurrentDateTimeString();
-    std::string convertTmDateToString(tm &tm);
+    std::wstring getCurrentDateString();
+    std::wstring getCurrentDateTimeString();
+    std::wstring convertTmDateToString(tm &tm);
 };
 
 #endif // DATETIME_H
