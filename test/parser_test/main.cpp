@@ -160,5 +160,5 @@ int main() {
     }
 
     std::wcout << "parser_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
-    return 0;
+    return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

@@ -69,5 +69,5 @@ int main() {
     }
 
     std::wcout << "datetime_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
-    return 0;
+    return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

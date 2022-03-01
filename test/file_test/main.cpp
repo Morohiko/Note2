@@ -52,4 +52,5 @@ int main() {
     }
 
     std::wcout << "file_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

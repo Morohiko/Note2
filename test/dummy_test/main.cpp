@@ -11,11 +11,13 @@
 int testSetFilenameHandler(Dummy &dummy) {
     int retval = STATUS_SUCCESS;
     std::string filename = "filename.txt";
+    // file is not exist case
     retval = dummy.setFilenameHandler(&filename);
-    if (retval != STATUS_SUCCESS) {
+    if (retval != STATUS_FILE_NOT_FOUND) {
         return STATUS_TEST_FAILED;
     }
 
+    // file is exist case
     std::wofstream MyFile(filename.c_str());
     MyFile.close();
     retval = dummy.setFilenameHandler(&filename);
@@ -115,5 +117,5 @@ int main() {
         isPassed = false;
     }
     std::wcout << "dummy_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
-    return 0;
+    return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }
