@@ -33,7 +33,6 @@ int File::writeToEndFile(std::wstring &src) {
     for (int i = 0; i < this->path.length(); i++) {
         filename[i] = this->path[i];
     }
-    std::cout << "writetifile: filename = " << filename << std::endl;
 
     std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary);
     for (int i = 0; i < src.length(); i++) {
