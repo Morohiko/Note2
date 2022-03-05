@@ -29,34 +29,50 @@ int File::writeToEndFile(std::wstring &src) {
         std::wcout  << LOG_ERROR << "qwriteToEndFile this->path == nullptr";
         return -1;
     }
-    std::wofstream out;
-    // std::ios::app is the open mode "append" meaning
-    // new data will be written to the end of the file.
-    out.open(this->path, std::ios::app);
-    out << src;
+    std::string filename(this->path.length(), '\0');
+    for (int i = 0; i < this->path.length(); i++) {
+        filename[i] = this->path[i];
+    }
+    std::cout << "writetifile: filename = " << filename << std::endl;
+
+    std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary);
+    for (int i = 0; i < src.length(); i++) {
+        outFile.write((char *) &src.at(i), 2);
+    }
+    outFile.close();
     return 0;
 }
-#include <codecvt>
-#include <sstream>
 
-int File::readFromFileByPosition(int pos, int size, std::wstring &output) {
+int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     int retval = isFileExists(this->path);
     if (retval == STATUS_FILE_NOT_FOUND) {
         std::cout << LOG_ERROR << "file with this->path is not exist " << this->path << std::endl;
         return STATUS_FILE_NOT_FOUND;
     }
-    std::wifstream file(this->path, std::ios::ate|std::ios::binary);
-    int filesize;
-    if (file.is_open()) {
-        filesize = file.tellg();
-        if (pos >= filesize) {
-            return STATUS_END_OF_FILE;
-        }
-        file.seekg(pos, std::ios::beg);
-        output.resize(size);
-        file.read(&output[0], size);
-    } else {
-        std::wcout << LOG_DEBUG << "file is closed" << std::endl;
+    std::string filename(this->path.length(), '\0');
+    for (int i = 0; i < this->path.length(); i++) {
+        filename[i] = this->path[i];
     }
+    std::ifstream fin(filename.c_str(), std::ios::binary);
+
+    // check if bom exist
+    fin.seekg(pos*2, std::ios::beg);
+    std::u16string u16Bom(size, '\0'); // +2 in case bom
+    fin.read((char*)&u16Bom[0], 2);
+    wchar_t sym = u16Bom.at(0);
+    if ((int)sym == 0xfeff || (int(sym) == 0xfffe)) {
+        std::wcout << LOG_DEBUG << "skip BOM" << std::endl;
+        pos++;
+    }
+    fin.seekg(pos*2, std::ios::beg);
+    std::u16string u16(size, '\0'); // +2 in case bom
+    fin.read((char*)&u16[0], size*2);
+    output.resize(size);
+    int iout = 0;
+    for (int i = 0; i < u16.length(); i++) {
+        wchar_t sym = u16.at(i);
+        output[iout++] = ((int)u16.at(i));
+    }
+    fin.close();
     return STATUS_SUCCESS;
 }

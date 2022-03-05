@@ -41,7 +41,7 @@ int testWriteReadFile(std::string &filepath) {
 }
 
 int main() {
-    std::string filepath = "/home/user/work/Note2/test/file_test/testfile.txt";
+    std::string filepath = "testfile.txt";
     int retval;
     bool isPassed = true;
 

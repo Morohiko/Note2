@@ -35,7 +35,7 @@ int testPerformReadByDateHandler(Dummy &dummy) {
     std::string filename = "filename.txt";
 
     std::wofstream MyFile(filename.c_str());
-    MyFile << L"2022/02/19.23:32_000030_123123";
+    MyFile << L"2022/02/19.23:32_000030_123123_";
     MyFile.close();
     retval = dummy.setFilenameHandler(&filename);
     if (retval != STATUS_SUCCESS) {

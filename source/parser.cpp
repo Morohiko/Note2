@@ -7,11 +7,10 @@
 
 Parser::Parser() {}
 
-// 2022/2/19.23:32_000030
 int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &size) {
     int retval = 0;
-    std::wcout << LOG_ERROR << "text = " << text << std::endl;
-    if (text.length() < SIZE_OF_HEADER) {
+    std::wcout << LOG_ERROR << "text.length() = " << text.length() << ", text = " << text << std::endl;
+    if (text.length()*2 < SIZE_OF_HEADER) {
         std::wcout << "ERROR: cant parse head, string is corrupted: head = " << text << std::endl;
         return STATUS_FAILURE;
     }
@@ -32,33 +31,33 @@ int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &d
     // 10 - size of date in header
     if (text.length() < SIZE_OF_DATE ) {
         std::wcout << "ERROR: cant parse time from header: text = " << text <<
-        ", text.length = " << text.length() << std::endl;
+                      ", text.length = " << text.length() << std::endl;
         return STATUS_FAILURE;
     }
     std::wcout << LOG_DEBUG << "text  = " << text << std::endl;
-    date = text.substr(0, SIZE_OF_DATE);
+    date = text.substr(DATE_POSITION, SIZE_OF_DATE);
     return STATUS_SUCCESS;
 }
 
 int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &time) {
     // 15 - size of date and time in header
-    if (text.length() < 15) {
+    if (text.length() < SIZE_OF_TIME) {
         std::wcout << "ERROR: cant parse time from header: text = " << text <<
         ", text.length = " << text.length() << std::endl;
         return STATUS_FAILURE;
     }
-    time = text.substr(SIZE_OF_DATE + 1, SIZE_OF_TIME);
+    time = text.substr(TIME_POSITION, SIZE_OF_TIME);
     return STATUS_SUCCESS;
 }
 
 int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
     int iter = 0;
-    if (text.length() < SIZE_OF_HEADER) {
+    if (text.length()*2 < SIZE_OF_HEADER) {
         std::wcout << "ERROR: header was broken: " <<
                     "text.size = " << text.size() << std::endl;
         return STATUS_FAILURE;
     }
-    std::wstring sizeString = text.substr(17, 6);
+    std::wstring sizeString = text.substr(SIZE_POSITION, SIZE_OF_SIZE);
     if (sizeString.length() != SIZE_OF_SIZE) {
         std::wcout << "ERROR: cant parse size from header: " <<
             "sizeString.length() = " << sizeString.length() << 
@@ -86,7 +85,7 @@ int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
 
 std::wstring Parser::generateStringFromSize(int size) {
     std::wstring sizeBuff = std::to_wstring(size);
-    while (sizeBuff.size() < 6) {
+    while (sizeBuff.size() < SIZE_OF_SIZE) {
         sizeBuff = L"0" + sizeBuff;
     }
     return sizeBuff;

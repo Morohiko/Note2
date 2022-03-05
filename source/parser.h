@@ -4,6 +4,8 @@
 #include <string>
 #include <ctime>
 
+#include "config.h"
+
 class Parser
 {
 public:

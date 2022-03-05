@@ -5,18 +5,24 @@
 #include <cstring>
 
 #define SIZE_OF_HEADER 24
+#define DATE_POSITION 0
 #define SIZE_OF_DATE 10
+#define TIME_POSITION 11
 #define SIZE_OF_TIME 5
-#define SIZE_OF_DATETIME SIZE_OF_DATE + SIZE_OF_TIME + 1
+#define DATETIME_POSITION 0
+#define SIZE_OF_DATETIME 16
+#define SIZE_POSITION 17
 #define SIZE_OF_SIZE 6
 #define WITH_ENCODER
 
 #define UNICODE
 #ifdef UNICODE
-#define CODEC "UTF-16"
+    #define CODEC_UTF_16
 #else
-#define CODEC "UTF-8"
+    // not supported
+    #define CODEC_UTF_8
 #endif
+
 
 // status
 #define STATUS_SUCCESS 0

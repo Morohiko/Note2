@@ -19,13 +19,9 @@ std::wstring Encoder::encodeStringByKey(std::wstring &src, std::wstring &key) {
 
 std::wstring Encoder::decodeStringByKey(std::wstring &src, std::wstring &key) {
     std::wstring dest;
-
     int nkey = 0;
     for (int i = 0; i < src.size(); i++) {
-        std::wcout << "src.at(" << i << ") = " << (int)src.at(i) << ", key.at(" << nkey << ") = " << (uint32_t)key.at(nkey) << std::endl;
-        // uint32_t buff = src.at(i) - key.at(nkey);
-        uint32_t buff = key.at(nkey) - src.at(i);
-        std::wcout << LOG_DEBUG << "buff = " << (uint32_t)buff << std::endl;
+        uint32_t buff = src.at(i) > key.at(nkey) ? src.at(i) - key.at(nkey) : key.at(nkey) - src.at(i);
         dest.push_back(buff);
         if (key.size() <= ++nkey) nkey = 0;
     }

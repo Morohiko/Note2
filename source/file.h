@@ -6,7 +6,7 @@ class File
 public:
     bool isCurrentFileEmpty();
     int writeToEndFile(std::wstring &src);
-    int readFromFileByPosition(int pos, int size, std::wstring &output);
+    int readFromFileByPosition(int &pos, int size, std::wstring &output);
     int setPathToFile(std::string &src);
 private:
     std::string path;

@@ -38,7 +38,6 @@ public:
 #endif
 
 private:
-    // MainWindow window;
     File file;
     Encoder encoder;
     Parser parser;
@@ -55,7 +54,7 @@ private:
 #endif
 
     int findPositionByHeader(int pos, std::wstring &header, std::wstring &key);
-    int findPositionByDate(int pos, std::wstring &date, int &returnedPosition, std::wstring &key);
+    int findPositionByDate(int &pos, std::wstring &date, std::wstring &key);
     int performReadBodyByHead(std::wstring &head, std::wstring &body, std::wstring &key);
 
     bool isValidKey(std::wstring &key);

@@ -97,20 +97,20 @@ int Note::setFilename(std::string &filename) {
 #ifdef WITH_ENCODER
 std::wstring Note::performEncodeString(std::wstring &text, std::wstring &key) {
     std::wstring dest;
-    if (key.size() > 0) {
-        dest = encoder.encodeStringByKey(text, key);
+    if (key.size() == 0) {
+        std::wcout << LOG_ERROR << "key.size() == 0" << std::endl;
         return dest;
     }
-    return text;
+    return encoder.encodeStringByKey(text, key);
 }
 
 std::wstring Note::performDecodeString(std::wstring &text, std::wstring &key) {
     std::wstring dest;
-    if (key.size() > 0) {
-        dest = encoder.decodeStringByKey(text, key);
+    if (key.size() == 0) {
+        std::wcout << LOG_ERROR << "key.size() == 0" << std::endl;
         return dest;
     }
-    return text;
+    return encoder.decodeStringByKey(text, key);
 }
 #endif
 
@@ -153,7 +153,6 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &currentD
 // return position or negative value in case error
 int Note::findPositionByHeader(int pos, std::wstring &header, std::wstring &key) {
     int size = 0;
-
     do {
         std::wstring headerTmp;
         int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
@@ -183,10 +182,9 @@ int Note::findPositionByHeader(int pos, std::wstring &header, std::wstring &key)
     return STATUS_SUCCESS;
 }
 
-int Note::findPositionByDate(int pos, std::wstring &date, int &returnPosition, std::wstring &key) {
+int Note::findPositionByDate(int &pos /*output*/, std::wstring &date, std::wstring &key) {
     std::wstring dateBuff;
     int size = 0;
-
     do {
         std::wstring headerTmp;
         int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
@@ -217,14 +215,13 @@ int Note::findPositionByDate(int pos, std::wstring &date, int &returnPosition, s
             pos += size;
         }
 
-        if (date == dateBuff) {
-            return pos;
+        if (date.compare(dateBuff) == 0) {
+            return STATUS_SUCCESS;
         }
     } while (true);
 }
 
 int Note::performReadBodyByHead(std::wstring &head, std::wstring &ouptut, std::wstring &key) {
-    std::wcout << LOG_DEBUG << "head = " << head << std::endl;
     int pos = 0;
     int size = 0;
 
@@ -268,7 +265,6 @@ bool Note::isValidKey(std::wstring &key) {
         std::wcout << LOG_ERROR << "isValidKey/readFromFileByPosition: retval = " << retval << std::endl;
         return STATUS_FAILURE;
     }
-    std::wcout << LOG_ERROR << "buff.length = " << buff.length() << ", buff = " << buff << std::endl;
 
 #ifdef WITH_ENCODER
     buff = performDecodeString(buff, key);
@@ -326,28 +322,28 @@ int Note::performReadByDate(tm &date, std::wstring &text, std::wstring &key) {
     std::wstring head;
     std::wstring time;
     std::wstring body;
-    while (true) {
-        int retval = findPositionByDate(pos, dateString, returnedPosition, key);
-        if (retval == STATUS_END_OF_FILE) {
-            std::wcout << LOG_WARN << "End of file" << std::endl;
-            break;
-        }
-        if (retval == STATUS_FAILURE) {
-            std::wcout << LOG_ERROR << "failure on find position" << std::endl;
-        }
-        pos = returnedPosition;
-        retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
-        if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "retval = " << retval << std::endl;
-            return retval;
-        }
-#ifdef WITH_ENCODER
-        head = performDecodeString(head, key);
-#endif
-        parser.parseHeadFromStringGetTimeString(head, time);
-        retval = performReadBodyByHead(head, body, key);
-        text.append(time + L'\n' + body + L"\n\n");
-        pos += body.size() + SIZE_OF_HEADER;
+    bool found = false;
+    int retval = findPositionByDate(pos, dateString, key);
+
+    if (retval != STATUS_SUCCESS) {
+        std::wcout << LOG_ERROR << "failure on find position" << std::endl;
+        return retval;
     }
-    return 0;
+    std::wcout << LOG_DEBUG << "date found" << std::endl;
+    retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
+    if (retval != STATUS_SUCCESS) {
+        std::wcout << LOG_ERROR << "retval = " << retval << std::endl;
+        return retval;
+    }
+#ifdef WITH_ENCODER
+    head = performDecodeString(head, key);
+#endif
+    parser.parseHeadFromStringGetTimeString(head, time);
+    retval = performReadBodyByHead(head, body, key);
+    if (retval != STATUS_SUCCESS) {
+        std::wcout << LOG_ERROR << "failure on read body" << std::endl;
+        return retval;
+    }
+    text.append(time + L'\n' + body + L"\n\n");
+    return STATUS_SUCCESS;
 }
