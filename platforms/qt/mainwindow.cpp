@@ -51,7 +51,7 @@ void MainWindow::slotForWriteButton() {
     bool isCheckBox = this->isCheckedCheckBoxCustomTime();
     QDateTime datetime = this->getCustomDateTime();
     QString key = getKey();
-    int stat = performWriteToFileHandler(&text, isCheckBox, &datetime, &key);
+    int stat = performWriteToFileHandler(text, isCheckBox, datetime, key);
     if (stat) {
         setColorForPushButton(btnWrite, QColor(Qt::red));
     } else {
@@ -65,7 +65,7 @@ void MainWindow::slotForOpenButton() {
 
     int retval = 0;
     if (filename.size() >= 1 || filename != nullptr) {
-        retval = setFilenameHandler(&filename);
+        retval = setFilenameHandler(filename);
     } else {
         retval = -1;
     }
@@ -84,7 +84,7 @@ void MainWindow::readByTreeWidgetItem(QTreeWidgetItem *item) {
     QDate date(year, month, day);
     QString text;
     QString key = getKey();
-    performReadByDateHandler(&date, &text, &key);
+    performReadByDateHandler(date, key, text);
     textEdit->clear();
     textEdit->setText(text);
 }
@@ -98,7 +98,7 @@ void MainWindow::slotForReadButton() {
     QList<QDate *> dateList;
     QString key = getKey();
 
-    if (performReadAllDateHandler(&dateList, &key) > 0) {
+    if (performReadAllDateHandler(key, dateList) == 0) {
         setColorForPushButton(btnRead, QColor(Qt::green));
         qDebug() << "DEBUG performReadAllDatetime is good";
     } else {
@@ -146,10 +146,10 @@ void MainWindow::setColorForPushButton(QPushButton *btn, QColor color) {
     btn->update();
 }
 
-void MainWindow::setCallbacks(int (*setFilename)(QString *filename),
-                              int (*performReadByDate)(QDate *date, QString *text, QString *key),
-                              int (*performReadAllDate)(QList<QDate *> *dateList, QString *key),
-                              int (*performWriteToFile)(QString *text, bool isCustomTime, QDateTime *datetime, QString *key)) {
+void MainWindow::setCallbacks(int (*setFilename)(QString &filename),
+                              int (*performReadByDate)(QDate &date, QString &key, QString &outputBody),
+                              int (*performReadAllDate)(QString &key, QList<QDate *> &dateList),
+                              int (*performWriteToFile)(QString &text, bool isCustomTime, QDateTime &datetime, QString &key)) {
     setFilenameHandler = setFilename;
     performReadByDateHandler = performReadByDate;
     performReadAllDateHandler = performReadAllDate;

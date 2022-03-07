@@ -12,7 +12,7 @@ int testSetFilenameHandler(Dummy &dummy) {
     int retval = STATUS_SUCCESS;
     std::string filename = "filename.txt";
     // file is not exist case
-    retval = dummy.setFilenameHandler(&filename);
+    retval = dummy.setFilenameHandler(filename);
     if (retval != STATUS_FILE_NOT_FOUND) {
         return STATUS_TEST_FAILED;
     }
@@ -20,7 +20,7 @@ int testSetFilenameHandler(Dummy &dummy) {
     // file is exist case
     std::wofstream MyFile(filename.c_str());
     MyFile.close();
-    retval = dummy.setFilenameHandler(&filename);
+    retval = dummy.setFilenameHandler(filename);
     std::remove(filename.c_str());
     if (retval != STATUS_SUCCESS) {
         return STATUS_TEST_FAILED;
@@ -37,7 +37,7 @@ int testPerformReadByDateHandler(Dummy &dummy) {
     std::wofstream MyFile(filename.c_str());
     MyFile << L"2022/02/19.23:32_000030_123123_";
     MyFile.close();
-    retval = dummy.setFilenameHandler(&filename);
+    retval = dummy.setFilenameHandler(filename);
     if (retval != STATUS_SUCCESS) {
         return STATUS_TEST_FAILED;
     }
@@ -46,7 +46,7 @@ int testPerformReadByDateHandler(Dummy &dummy) {
     tm.tm_mon = 2;
     tm.tm_mday = 19;
     std::wstring key;
-    retval = dummy.performReadByDateHandler(&tm, &text, &key);
+    retval = dummy.performReadByDateHandler(tm, key, text);
     expected_text = L"23:32\n123123\n\n";
     if (expected_text.compare(text) != 0) {
         return STATUS_TEST_FAILED;
@@ -60,7 +60,7 @@ int testPerformReadAllDateHandle(Dummy &dummy) {
     std::wofstream MyFile(filename.c_str());
     MyFile << L"2022/02/19.23:32_000030_1231232010/01/01.01:01_000030_222222";
     MyFile.close();
-    retval = dummy.setFilenameHandler(&filename);
+    retval = dummy.setFilenameHandler(filename);
     if (retval != STATUS_SUCCESS) {
         return STATUS_TEST_FAILED;
     }
@@ -69,7 +69,7 @@ int testPerformReadAllDateHandle(Dummy &dummy) {
     expectedList.push_back(L"2020/03/24");
     std::list<std::wstring> dateList;
     std::wstring key;
-    retval = dummy.performReadAllDateHandler(&dateList, &key);
+    retval = dummy.performReadAllDateHandler(key, dateList);
     if (retval != 2) {
         std::wcout << LOG_ERROR << "return must be count of read data" << std::endl;
         return STATUS_TEST_FAILED;

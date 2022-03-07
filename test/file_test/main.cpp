@@ -16,7 +16,7 @@ bool isFileExists(std::string &name) {
 int createFile(std::string &name) {
     std::wofstream MyFile(name);
     MyFile.close();
-    return 0;
+    return STATUS_SUCCESS;
 }
 
 // *************************************************** //

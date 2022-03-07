@@ -8,10 +8,13 @@
 int testGenerateStringFromSize() {
     Parser parser;
     std::wstring data, expectedData;
+    int retval;
 
     expectedData = L"000010";
-    data = parser.generateStringFromSize(10);
-
+    retval = parser.generateStringFromSize(10, data);
+    if (retval != STATUS_SUCCESS) {
+        return STATUS_FAILURE;
+    }
     if (expectedData.compare(data) != 0) return STATUS_TEST_FAILED;
 
     return STATUS_SUCCESS;
@@ -21,12 +24,16 @@ int testGenerateHead() {
     Parser parser;
     std::wstring data, datetime, expectedData;
     int size;
+    int retval;
 
     datetime = L"2022/02/19.23:32";
     size = 30;
     expectedData = L"2022/02/19.23:32_000030_";
 
-    data = parser.generateHead(datetime, size);
+    retval = parser.generateHead(datetime, size, data);
+    if (retval != STATUS_SUCCESS) {
+        return STATUS_TEST_FAILED;
+    }
     if (expectedData.compare(data) != 0) return STATUS_TEST_FAILED;
 
     return STATUS_SUCCESS;

@@ -34,7 +34,7 @@
 // logs
 #define __FILENAME__ strrchr(__FILE__, '/') + 1
 #define FULL_LOG_FORMAT __FILENAME__ << ":" << __LINE__ << ":" << __func__ << ": "
-#define LOG_ERROR "DEBUG:" << FULL_LOG_FORMAT
+#define LOG_ERROR "ERROR:" << FULL_LOG_FORMAT
 #define LOG_WARN "WARN:" << FULL_LOG_FORMAT
 #define LOG_INFO "INFO:" << FULL_LOG_FORMAT
 #define LOG_DEBUG "DEBUG:" << FULL_LOG_FORMAT

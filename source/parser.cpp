@@ -7,6 +7,15 @@
 
 Parser::Parser() {}
 
+/**
+ * @brief parse date and size from text
+ *
+ * @param[in] text input text with head
+ * @param[out] date parsed date
+ * @param[out] size parsed size
+ * 
+ * @return execution status
+ */
 int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &size) {
     int retval = 0;
     std::wcout << LOG_ERROR << "text.length() = " << text.length() << ", text = " << text << std::endl;
@@ -27,8 +36,15 @@ int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &siz
     return retval;
 }
 
+/**
+ * @brief parse date from text
+ *
+ * @param[in] text input text with head
+ * @param[out] date parsed date
+ * 
+ * @return execution status
+ */
 int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &date) {
-    // 10 - size of date in header
     if (text.length() < SIZE_OF_DATE ) {
         std::wcout << LOG_ERROR << "cant parse time from header: text = " << text <<
                       ", text.length = " << text.length() << std::endl;
@@ -39,8 +55,15 @@ int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &d
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief parse time from text
+ *
+ * @param[in] text input text with head
+ * @param[out] time parsed time
+ * 
+ * @return execution status
+ */
 int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &time) {
-    // 15 - size of date and time in header
     if (text.length() < SIZE_OF_TIME) {
         std::wcout << LOG_ERROR << "cant parse time from header: text = " << text <<
         ", text.length = " << text.length() << std::endl;
@@ -50,8 +73,15 @@ int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &t
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief parse size from text
+ *
+ * @param[in] text input text with head
+ * @param[out] size parsed size
+ * 
+ * @return execution status
+ */
 int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
-    int iter = 0;
     if (text.length()*2 < SIZE_OF_HEADER) {
         std::wcout << LOG_ERROR << "header was broken: " <<
                     "text.size = " << text.size() << std::endl;
@@ -80,22 +110,45 @@ int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
                 "sizeString = " << sizeString << std::endl;
         return STATUS_FAILURE;
     }
-    return 0;
+    return STATUS_SUCCESS;
 }
 
-std::wstring Parser::generateStringFromSize(int size) {
-    std::wstring sizeBuff = std::to_wstring(size);
-    while (sizeBuff.size() < SIZE_OF_SIZE) {
-        sizeBuff = L"0" + sizeBuff;
+/**
+ * @brief generate size string from int size
+ *
+ * @param[in] size size in int
+ * @param[out] dest generated string size
+ * 
+ * @return execution status
+ */
+int Parser::generateStringFromSize(int size, std::wstring &dest) {
+    dest = std::to_wstring(size);
+    while (dest.size() < SIZE_OF_SIZE) {
+        dest = L"0" + dest;
     }
-    return sizeBuff;
+    return STATUS_SUCCESS;
 }
 
-std::wstring Parser::generateHead(std::wstring &currentDateTime, int size) {
-    std::wstring text;
-    text.append(currentDateTime);
-    text.append(L"_");
-    text.append(generateStringFromSize(size));
-    text.append(L"_");
-    return text;
+/**
+ * @brief generate head from date and size
+ *
+ * @param[in] currentDateTime date for head
+ * @param[in] size size for head
+ * @param[out] dest generated head with date and size
+ * 
+ * @return execution status
+ */
+int Parser::generateHead(std::wstring &currentDateTime, int size, std::wstring &dest) {
+    std::wstring sizeString;
+    int retval;
+    retval = generateStringFromSize(size, sizeString);
+    if (retval != STATUS_SUCCESS) {
+        std::wcout << LOG_ERROR << "cant generate string from size" << std::endl;
+        return STATUS_FAILURE;
+    }
+    dest.append(currentDateTime);
+    dest.append(L"_");
+    dest.append(sizeString);
+    dest.append(L"_");
+    return STATUS_SUCCESS;
 }

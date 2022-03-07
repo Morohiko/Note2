@@ -7,18 +7,19 @@
 int testCurrentDateDateTimeString() {
     std::wstring text;
     DateTime datetime;
+    int retval;
 
     datetime.updateToCurrentDateTime();
 
-    text = datetime.getCurrentDateString();
-    if (text.length() != SIZE_OF_DATE) {
+    retval = datetime.getCurrentDateString(text);
+    if (retval != STATUS_SUCCESS || text.length() != SIZE_OF_DATE) {
         return STATUS_TEST_FAILED;
     }
 
-    text = datetime.getCurrentDateTimeString();
+    retval = datetime.getCurrentDateTimeString(text);
     std::wcout << "getCurrentDateTimeString: text = " << text << std::endl;
 
-    if (text.length() != SIZE_OF_DATETIME) {
+    if (retval != STATUS_SUCCESS || text.length() != SIZE_OF_DATETIME) {
         return STATUS_TEST_FAILED;
     }
     return STATUS_SUCCESS;
@@ -28,6 +29,8 @@ int testCustomDateDateTimeString() {
     std::wstring date, expected_date;
     DateTime datetime;
     tm tm;
+    int retval;
+
     tm.tm_year = 2022;
     tm.tm_mon = 3;
     tm.tm_mday = 2;
@@ -37,15 +40,17 @@ int testCustomDateDateTimeString() {
     datetime.updateToCustomDateTime(tm);
 
     expected_date = L"2022/03/02";
-    date = datetime.getCurrentDateString();
-    if (date.length() != SIZE_OF_DATE ||
+    retval = datetime.getCurrentDateString(date);
+    if (retval != STATUS_SUCCESS ||
+        date.length() != SIZE_OF_DATE ||
         date.compare(expected_date) != 0) {
         return STATUS_TEST_FAILED;
     }
 
     expected_date = L"2022/03/02.12:44";
-    date = datetime.getCurrentDateTimeString();
-    if (date.length() != SIZE_OF_DATETIME ||
+    retval = datetime.getCurrentDateTimeString(date);
+    if (retval != STATUS_SUCCESS ||
+        date.length() != SIZE_OF_DATETIME ||
         date.compare(expected_date) != 0) {
         return STATUS_TEST_FAILED;
     }
@@ -64,7 +69,7 @@ int main() {
 
     retval = testCustomDateDateTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
+        std::wcout << "datetime_test: testCustomDateDateTimeString failed" << std::endl;
         isPassed = false;
     }
 
