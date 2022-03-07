@@ -27,19 +27,19 @@ int File::setPathToFile(std::string &src) {
 int File::writeToEndFile(std::wstring &src) {
     if (this->path.size() < 1) {
         std::wcout  << LOG_ERROR << "qwriteToEndFile this->path == nullptr";
-        return -1;
+        return STATUS_FAILURE;
     }
     std::string filename(this->path.length(), '\0');
     for (int i = 0; i < this->path.length(); i++) {
         filename[i] = this->path[i];
     }
 
-    std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary);
+    std::ofstream outFile(filename.c_str(), std::ios::out | std::ios::binary | std::ios::app);
     for (int i = 0; i < src.length(); i++) {
         outFile.write((char *) &src.at(i), 2);
     }
     outFile.close();
-    return 0;
+    return STATUS_SUCCESS;
 }
 
 int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
