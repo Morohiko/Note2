@@ -396,15 +396,13 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
     std::wstring buff;
     std::wstring date;
     int retval;
-    int state = 0;
 
     do {
         buff.clear();
         retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
         if (retval == STATUS_END_OF_FILE) {
-            std::wcout << LOG_WARN << "performReadAllDate end of file buff = " << buff << std::endl;
-            state = retval;
-            break;
+            std::wcout << LOG_WARN << "performReadAllDate end of file" << std::endl;
+            return STATUS_SUCCESS;
         }
         if (retval != STATUS_SUCCESS) {
             std::wcout << LOG_ERROR << "performReadAllDate failure" << std::endl;
@@ -427,8 +425,8 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
         std::wcout << LOG_DEBUG << "dateList push_back: date = " << date << std::endl;
         dateList.push_back(date);
         pos += size;
-    } while (state != STATUS_END_OF_FILE);
-    return STATUS_SUCCESS;
+    } while (true);
+    return retval;
 }
 
 /**

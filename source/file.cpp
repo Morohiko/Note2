@@ -92,7 +92,12 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     // check if bom exist
     fin.seekg(pos*2, std::ios::beg);
     std::u16string u16Bom(size, '\0');
+    std::streamsize bytes;
     fin.read((char*)&u16Bom[0], 2);
+    bytes = fin.gcount();
+    if (bytes == 0) {
+        return STATUS_END_OF_FILE;
+    }
     wchar_t sym = u16Bom.at(0);
     if ((int)sym == 0xfeff || (int(sym) == 0xfffe)) {
         std::wcout << LOG_DEBUG << "skip BOM" << std::endl;
@@ -101,6 +106,10 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     fin.seekg(pos*2, std::ios::beg);
     std::u16string u16(size, '\0');
     fin.read((char*)&u16[0], size*2);
+    bytes = fin.gcount();
+    if (bytes == 0) {
+        return STATUS_END_OF_FILE;
+    }
     output.resize(size);
     int iout = 0;
     for (int i = 0; i < u16.length(); i++) {

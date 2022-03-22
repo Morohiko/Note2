@@ -18,7 +18,7 @@ Parser::Parser() {}
  */
 int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &size) {
     int retval = 0;
-    std::wcout << LOG_ERROR << "text.length() = " << text.length() << ", text = " << text << std::endl;
+    std::wcout << LOG_DEBUG << "text.length() = " << text.length() << ", text = " << text << std::endl;
     if (text.length()*2 < SIZE_OF_HEADER) {
         std::wcout << LOG_ERROR << "cant parse head, string is corrupted: head = " << text << std::endl;
         return STATUS_FAILURE;
