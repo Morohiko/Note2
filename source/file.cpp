@@ -3,6 +3,7 @@
 
 #include "file.h"
 #include "config.h"
+#include "log.h"
 
 /**
  * @brief check if file in path is empty
@@ -36,7 +37,7 @@ int File::isFileExists(const std::string &filename) {
 int File::setPathToFile(std::string &src) {
     int retval = isFileExists(src);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        std::cout << LOG_ERROR << "setPathToFile file with this->path is not exist " << src << std::endl;
+        LOG(LOG_ERROR, "setPathToFile file with this->path is not exist ", src);
         return STATUS_FILE_NOT_FOUND;
     }
     this->path = src;
@@ -52,7 +53,7 @@ int File::setPathToFile(std::string &src) {
  */
 int File::writeToEndFile(std::wstring &src) {
     if (this->path.size() < 1) {
-        std::wcout  << LOG_ERROR << "qwriteToEndFile this->path == nullptr";
+        WLOG(LOG_ERROR, "qwriteToEndFile this->path == nullptr");
         return STATUS_FAILURE;
     }
     std::string filename(this->path.length(), '\0');
@@ -80,7 +81,7 @@ int File::writeToEndFile(std::wstring &src) {
 int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     int retval = isFileExists(this->path);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        std::cout << LOG_ERROR << "file with this->path is not exist " << this->path << std::endl;
+        LOG(LOG_ERROR, "file with this->path is not exist ", this->path);
         return STATUS_FILE_NOT_FOUND;
     }
     std::string filename(this->path.length(), '\0');
@@ -100,7 +101,7 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     }
     wchar_t sym = u16Bom.at(0);
     if ((int)sym == 0xfeff || (int(sym) == 0xfffe)) {
-        std::wcout << LOG_DEBUG << "skip BOM" << std::endl;
+        WLOG(LOG_DEBUG, "skip BOM");
         pos++;
     }
     fin.seekg(pos*2, std::ios::beg);

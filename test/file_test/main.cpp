@@ -4,6 +4,7 @@
 
 #include "file.h"
 #include "config.h"
+#include "log.h"
 
 #define PATH_FILE "/home/user/work/Note2/test/file_test/testfile.txt"
 
@@ -35,7 +36,7 @@ int testWriteReadFile(std::string &filepath) {
     for (int i = 0; i < 40; i+=5) {
         std::wstring output;
         int retval = file.readFromFileByPosition(i, 5, output);
-        std::wcout << "output = " << output << ", retval = " << retval << std::endl;
+        WLOG(LOG_INFO, "output = ", output, ", retval = ", retval);
     }
     return STATUS_SUCCESS;
 }
@@ -47,10 +48,10 @@ int main() {
 
     retval = testWriteReadFile(filepath);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "file_test: testWriteReadFile failed" << std::endl;
+        WLOG(LOG_INFO, "file_test: testWriteReadFile failed");
         isPassed = false;
     }
 
-    std::wcout << "file_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    WLOG(LOG_INFO, "file_test: done ", ((isPassed) ? "passed" : "failed"));
     return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

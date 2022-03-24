@@ -5,7 +5,7 @@ set(NOTE_LIB_NAME "note_lib")
 
 project(${PROJECT_NAME} VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(PLATFORM "linux" CACHE STRING "Platform for build (linux)")
@@ -67,6 +67,10 @@ if (${WITH_TESTS})
     set(FILE_TEST_NAME "file_test")
     add_executable(${FILE_TEST_NAME} test/file_test/main.cpp)
     target_link_libraries(${FILE_TEST_NAME} ${NOTE_LIB_NAME})
+
+    set(LOGGER_TEST_NAME "logger_test")
+    add_executable(${LOGGER_TEST_NAME} test/logger_test/main.cpp)
+    target_link_libraries(${LOGGER_TEST_NAME} ${NOTE_LIB_NAME})
 
     if (${PLATFORM} STREQUAL "dummy")
         set(DUMMY_TEST_NAME "dummy_test")

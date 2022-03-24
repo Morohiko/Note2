@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "note.h"
+#include "log.h"
 
 Note::Note() {
     note = this;
@@ -9,14 +10,14 @@ Note::Note() {
 
 #ifdef USE_QT
 int Note::setFilenameHandler(QString &filename) {
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     std::string filename_std = filename.toStdString();
     return note->setFilename(filename_std);
 }
 
 int Note::performReadByDateHandler(QDate &date, QString &key, QString &outputBody) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    LOG(LOG_INFO, nullptr, nullptr);
     tm date_tm;
     int retval;
 
@@ -27,7 +28,7 @@ int Note::performReadByDateHandler(QDate &date, QString &key, QString &outputBod
     std::wstring keyStd = key.toStdWString();
     retval = note->performReadByDate(date_tm, keyStd, textStd);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant perform read by date" << std::endl;
+        WLOG(LOG_ERROR, "cant perform read by date");
     }
     outputBody = QString::fromStdWString(textStd);
     return STATUS_SUCCESS;
@@ -35,12 +36,12 @@ int Note::performReadByDateHandler(QDate &date, QString &key, QString &outputBod
 
 int Note::performReadAllDateHandler(QString &key, QList<QDate *> &dateList) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     std::list<std::wstring> list;
     std::wstring stdKey = key.toStdWString();
     int retval = note->performReadAllDate(stdKey, list);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant read all date from file" << std::endl;
+        WLOG(LOG_ERROR, "cant read all date from file");
         return STATUS_FAILURE;
     }
     std::list<std::wstring>::iterator it;
@@ -54,7 +55,7 @@ int Note::performReadAllDateHandler(QString &key, QList<QDate *> &dateList) {
 
 int Note::performWriteToFileHandler(QString &text, bool isCustomTime, QDateTime &datetime, QString &key) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     std::wstring stdText = text.toStdWString();
     std::wstring stdKey = key.toStdWString();
     tm date_time_tm;
@@ -75,25 +76,25 @@ int Note::performWriteToFileHandler(QString &text, bool isCustomTime, QDateTime 
 #ifdef USE_DUMMY
 int Note::setFilenameHandler(std::string &filename) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     return note->setFilename(filename);
 }
 
 int Note::performReadByDateHandler(tm &date, std::wstring &key, std::wstring &outputBody) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     return note->performReadByDate(date, key, outputBody);
 }
 
 int Note::performReadAllDateHandler(std::wstring &key, std::list<std::wstring> &dateList) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     return note->performReadAllDate(key, dateList);
 }
 
 int Note::performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key) {
     assert(note);
-    std::wcout << LOG_INFO << std::endl;
+    WLOG(LOG_INFO, nullptr, nullptr);
     return note->performWriteToFile(text, isCustomTime, datetime, key);
 }
 #endif
@@ -106,10 +107,10 @@ int Note::performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &d
  * @return execution status
  */
 int Note::setFilename(std::string &filename) {
-    std::cout << LOG_INFO << "save file " << filename << " for read write data" << std::endl;
+    LOG(LOG_INFO,"save file ", filename, " for read write data");
     int retval = file.setPathToFile(filename);
     if (retval != STATUS_SUCCESS) {
-        std::cout << LOG_ERROR << "cant set filename: filename = " << filename << std::endl;
+        LOG(LOG_ERROR, "cant set filename: filename = ", filename);
     }
     return retval;
 }
@@ -129,7 +130,7 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &customDa
     int retval;
     
     if (_isValidKey(key) == false) {
-        std::wcout << LOG_ERROR << "performWriteToFile isValidKey() == false" << std::endl;
+        WLOG(LOG_ERROR, "performWriteToFile isValidKey() == false");
         return STATUS_FAILURE;
     }
 
@@ -143,12 +144,12 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &customDa
     
     retval = datetime.getCurrentDateTimeString(datetimeStr);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant get current datetime string" << std::endl;
+        WLOG(LOG_ERROR, "cant get current datetime string");
         return STATUS_FAILURE;
     }
     retval = parser.generateHead(datetimeStr, size, head);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant generate head" << std::endl;
+        WLOG(LOG_ERROR, "cant generate head");
         return STATUS_FAILURE;
     }
 
@@ -156,7 +157,7 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &customDa
     std::wstring decodedHead;
     retval = encoder.encodeStringByKey(head, key, decodedHead);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cannot encode head" << std::endl;
+        WLOG(LOG_ERROR, "cannot encode head");
         return STATUS_FAILURE;
     }
     finalText.append(decodedHead);
@@ -168,7 +169,7 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &customDa
     std::wstring decodedText;
     retval = encoder.encodeStringByKey(text, key, decodedText);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cannot encode text" << std::endl;
+        WLOG(LOG_ERROR, "cannot encode text");
         return STATUS_FAILURE;
     }
     finalText.append(decodedText);
@@ -178,7 +179,7 @@ int Note::performWriteToFile(std::wstring &text, bool isCustomTime, tm &customDa
 
     retval = file.writeToEndFile(finalText);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "Cannot write to file" << std::endl;
+        WLOG(LOG_ERROR, "Cannot write to file");
         return STATUS_FAILURE;
     }
 
@@ -200,32 +201,32 @@ int Note::_findPositionByHeader(std::wstring &head, std::wstring &key, int &pos)
         std::wstring headerTmp;
         int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "retval = " << retval << std::endl;
+            WLOG(LOG_ERROR, "retval = ", retval);
             break;
         }
 #ifdef WITH_ENCODER
         std::wstring decodedHeaderTmp;
         retval = encoder.decodeStringByKey(headerTmp, key, decodedHeaderTmp);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "cant decode header" << std::endl;
+            WLOG(LOG_ERROR, "cant decode header");
             return STATUS_FAILURE;
         }
         headerTmp.clear();
         headerTmp.append(decodedHeaderTmp);
 #endif
         if (headerTmp.empty()) {
-            std::wcout << LOG_ERROR << "header decoded string is empty" << std::endl;
+            WLOG(LOG_ERROR, "header decoded string is empty");
             return STATUS_FAILURE;
         }
         
         if (head.compare(headerTmp) == 0) {
-            std::wcout << LOG_INFO << "found header by position" << std::endl;
+            WLOG(LOG_INFO, "found header by position");
             return STATUS_SUCCESS;
         }
 
         retval = parser.parseHeadFromStringGetSize(headerTmp, size);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "cant get size from head" << std::endl;
+            WLOG(LOG_ERROR, "cant get size from head");
             return STATUS_FAILURE;
         }
         pos += size;
@@ -251,15 +252,15 @@ int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &pos) {
         std::wstring headerTmp;
         int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_WARN << "cant file date: " << date << std::endl;
+            WLOG(LOG_WARN, "cant file date: ", date);
             return retval;
         }
         if (retval == STATUS_FAILURE) {
-            std::wcout << LOG_ERROR << "cant file posinion, date: " << date << std::endl;
+            WLOG(LOG_ERROR, "cant file posinion, date: ", date);
             return retval;
         }
         if (headerTmp.empty()) {
-            std::wcout << LOG_ERROR << "not found" << std::endl;
+            WLOG(LOG_ERROR, "not found");
             return STATUS_FAILURE;
         }
 
@@ -267,7 +268,7 @@ int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &pos) {
         std::wstring decodedHeaderTmp;
         retval = encoder.decodeStringByKey(headerTmp, key, decodedHeaderTmp);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "cant decode header" << std::endl;
+            WLOG(LOG_ERROR, "cant decode header");
             return STATUS_FAILURE;
         }
         headerTmp.clear();
@@ -276,18 +277,18 @@ int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &pos) {
 
         retval = parser.parseHeadFromStringGetDateString(headerTmp, dateBuff);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "cant parse date from head, retval: " << retval << std::endl;
+            WLOG(LOG_ERROR, "cant parse date from head, retval: ", retval);
             return retval;
         }
 
         if (date.compare(dateBuff) == 0) {
-            std::wcout << LOG_INFO << "found position by date" << std::endl;
+            WLOG(LOG_INFO, "found position by date");
             return STATUS_SUCCESS;
         }
 
         retval = parser.parseHeadFromStringGetSize(headerTmp, size);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "cant get size from head" << std::endl;
+            WLOG(LOG_ERROR, "cant get size from head");
             return STATUS_FAILURE;
         }
         pos += size;
@@ -313,7 +314,7 @@ int Note::_performReadBodyByHead(std::wstring &head, std::wstring &key, std::wst
 
     retval = _findPositionByHeader(head, key, pos);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant find position by head" << std::endl;
+        WLOG(LOG_ERROR, "cant find position by head");
         return STATUS_FAILURE;
     }
 
@@ -327,7 +328,7 @@ int Note::_performReadBodyByHead(std::wstring &head, std::wstring &key, std::wst
 
     retval = file.readFromFileByPosition(pos, size, ouptut);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "is not working" << std::endl;
+        WLOG(LOG_ERROR, "is not working");
         return retval;
     }
 
@@ -335,7 +336,7 @@ int Note::_performReadBodyByHead(std::wstring &head, std::wstring &key, std::wst
     std::wstring decodedOuptut;
     retval = encoder.decodeStringByKey(ouptut, key, decodedOuptut);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant decode body" << std::endl;
+        WLOG(LOG_ERROR, "cant decode body");
         return STATUS_FAILURE;
     }
     ouptut.clear();
@@ -357,12 +358,12 @@ bool Note::_isValidKey(std::wstring &key) {
     int pos = 0; int size;
     std::wstring date_str;
     if (file.isCurrentFileEmpty()) {
-        std::wcout << LOG_ERROR << "file is empty" << std::endl;
+        WLOG(LOG_ERROR, "file is empty");
         return true;
     }
     int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "isValidKey/readFromFileByPosition: retval = " << retval << std::endl;
+        WLOG(LOG_ERROR, "isValidKey/readFromFileByPosition: retval = ", retval);
         return STATUS_FAILURE;
     }
 
@@ -370,7 +371,7 @@ bool Note::_isValidKey(std::wstring &key) {
     std::wstring decudedBuff;
     retval = encoder.decodeStringByKey(buff, key, decudedBuff);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant decode key" << std::endl;
+        WLOG(LOG_ERROR, "cant decode key");
         return false;
     }
     buff.clear();
@@ -401,17 +402,17 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
         buff.clear();
         retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
         if (retval == STATUS_END_OF_FILE) {
-            std::wcout << LOG_WARN << "performReadAllDate end of file" << std::endl;
+            WLOG(LOG_WARN, "performReadAllDate end of file");
             return STATUS_SUCCESS;
         }
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "performReadAllDate failure" << std::endl;
+            WLOG(LOG_ERROR, "performReadAllDate failure");
         }
 #ifdef WITH_ENCODER
         std::wstring decodedBuff;
         retval = encoder.decodeStringByKey(buff, key, decodedBuff);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << "cant decode buffer when read all date" << std::endl;
+            WLOG(LOG_ERROR, "cant decode buffer when read all date");
             return STATUS_FAILURE;
         }
         buff.clear();
@@ -419,10 +420,10 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
 #endif
         retval = parser.parseHeadFromString(buff, date, size);
         if (retval != STATUS_SUCCESS) {
-            std::wcout << LOG_ERROR << "parser.parseHeadFromString retval = " << retval << std::endl;
+            WLOG(LOG_ERROR, "parser.parseHeadFromString retval = ", retval);
             break;
         }
-        std::wcout << LOG_DEBUG << "dateList push_back: date = " << date << std::endl;
+        WLOG(LOG_DEBUG, "dateList push_back: date = ", date);
         dateList.push_back(date);
         pos += size;
     } while (true);
@@ -448,19 +449,19 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
 
     retval = datetime.convertTmDateToString(date, dateString);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant convert tm to string" << std::endl;
+        WLOG(LOG_ERROR, "cant convert tm to string");
         return STATUS_FAILURE;
     }
 
     retval = _findPositionByDate(dateString, key, pos);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "failure on find position" << std::endl;
+        WLOG(LOG_ERROR, "failure on find position");
         return retval;
     }
-    std::wcout << LOG_DEBUG << "date found" << std::endl;
+    WLOG(LOG_DEBUG, "date found");
     retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "retval = " << retval << std::endl;
+        WLOG(LOG_ERROR, "retval = ", retval);
         return retval;
     }
 
@@ -468,7 +469,7 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
     std::wstring decodedHead;
     retval = encoder.decodeStringByKey(head, key, decodedHead);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "cant decode head on read by date" << std::endl;
+        WLOG(LOG_ERROR, "cant decode head on read by date");
         return STATUS_FAILURE;
     }
     head.clear();
@@ -477,13 +478,13 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
 
     retval = parser.parseHeadFromStringGetTimeString(head, time);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant get time from head" << std::endl;
+        WLOG(LOG_ERROR, "cant get time from head");
         return STATUS_FAILURE;
     }
 
     retval = _performReadBodyByHead(head, key, body);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "failure on read body" << std::endl;
+        WLOG(LOG_ERROR, "failure on read body");
         return retval;
     }
 

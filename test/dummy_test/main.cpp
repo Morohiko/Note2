@@ -7,6 +7,7 @@
 #include "dummy.h"
 #include "note.h"
 #include "config.h"
+#include "log.h"
 
 int testSetFilenameHandler(Dummy &dummy) {
     int retval = STATUS_SUCCESS;
@@ -71,11 +72,11 @@ int testPerformReadAllDateHandle(Dummy &dummy) {
     std::wstring key;
     retval = dummy.performReadAllDateHandler(key, dateList);
     if (retval != 2) {
-        std::wcout << LOG_ERROR << "return must be count of read data" << std::endl;
+        WLOG(LOG_ERROR, "return must be count of read data");
         return STATUS_TEST_FAILED;
     }
     if (expectedList.size() != dateList.size()) {
-        std::wcout << LOG_ERROR << "size missmatch" << std::endl;
+        WLOG(LOG_ERROR, "size missmatch");
         return STATUS_TEST_FAILED;
     }
     std::list<std::wstring>::iterator itDateList = dateList.begin();
@@ -84,7 +85,7 @@ int testPerformReadAllDateHandle(Dummy &dummy) {
         std::advance(itDateList, i);
         std::advance(itExpectedList, i);
         if (itExpectedList->compare(*itExpectedList) != 0) {
-            std::wcout << LOG_ERROR << "date missmatch: " << *itDateList << " != " << *itExpectedList << std::endl;
+            WLOG(LOG_ERROR, "date missmatch: ", *itDateList, " != ", *itExpectedList);
             return STATUS_TEST_FAILED;
         }
     }
@@ -102,20 +103,20 @@ int main() {
 
     retval = testSetFilenameHandler(dummy);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "dummy_test: testSetFilenameHandler failed" << std::endl;
+        WLOG(LOG_INFO, "dummy_test: testSetFilenameHandler failed");
         isPassed = false;
     }
-    std::wcout << LOG_DEBUG << "==================== testPerformReadByDateHandler ================" << std::endl;
+    WLOG(LOG_DEBUG, "==================== testPerformReadByDateHandler ================");
     retval = testPerformReadByDateHandler(dummy);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "dummy_test: testPerformReadByDateHandler failed" << std::endl;
+        WLOG(LOG_INFO, "dummy_test: testPerformReadByDateHandler failed");
         isPassed = false;
     }
     retval = testPerformReadAllDateHandle(dummy);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "dummy_test: testPerformReadAllDateHandle failed" << std::endl;
+        WLOG(LOG_INFO, "dummy_test: testPerformReadAllDateHandle failed");
         isPassed = false;
     }
-    std::wcout << "dummy_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    WLOG(LOG_INFO, "dummy_test: done ", ((isPassed) ? "passed" : "failed"));
     return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

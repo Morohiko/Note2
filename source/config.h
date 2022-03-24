@@ -23,20 +23,11 @@
     #define CODEC_UTF_8
 #endif
 
-
 // status
 #define STATUS_SUCCESS 0
 #define STATUS_FAILURE 1
 #define STATUS_END_OF_FILE 10
 #define STATUS_FILE_NOT_FOUND 11
 #define STATUS_TEST_FAILED 20
-
-// logs
-#define __FILENAME__ strrchr(__FILE__, '/') + 1
-#define FULL_LOG_FORMAT __FILENAME__ << ":" << __LINE__ << ":" << __func__ << ": "
-#define LOG_ERROR "ERROR:" << FULL_LOG_FORMAT
-#define LOG_WARN "WARN:" << FULL_LOG_FORMAT
-#define LOG_INFO "INFO:" << FULL_LOG_FORMAT
-#define LOG_DEBUG "DEBUG:" << FULL_LOG_FORMAT
 
 #endif // CONFIG_H

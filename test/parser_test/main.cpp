@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include "config.h"
+#include "log.h"
 
 int testGenerateStringFromSize() {
     Parser parser;
@@ -125,7 +126,7 @@ int testParseHeadFromString() {
     expectedSize = 30;
     text = L"2022/02/19.23:32_000030_";
     retval = parser.parseHeadFromString(text, dateResult, sizeResult);
-    std::wcout << "text = " << text << ", dateResult = " << dateResult << ", sizeResult = " << sizeResult << std::endl;
+    WLOG(LOG_INFO, "text = ", text, ", dateResult = ", dateResult, ", sizeResult = ", sizeResult);
     // if (retval != STATUS_SUCCESS || result.compare(expectedData) != 0) {
     //     return STATUS_TEST_FAILED;
     // }
@@ -137,35 +138,35 @@ int main() {
     bool isPassed = true;
     retval = testGenerateStringFromSize();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testGenerateStringFromSize failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testGenerateStringFromSize failed");
         isPassed = false;
     }
     retval = testGenerateHead();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testGenerateHead failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testGenerateHead failed");
         isPassed = false;
     }
     retval = testParseHeadFromStringGetSize();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testParseHeadFromStringGetSize failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testParseHeadFromStringGetSize failed");
         isPassed = false;
     }
     retval = testParseHeadFromStringGetTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testParseHeadFromStringGetTimeString failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testParseHeadFromStringGetTimeString failed");
         isPassed = false;
     }
     retval = testParseHeadFromStringGetDateString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testParseHeadFromStringGetDateString failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testParseHeadFromStringGetDateString failed");
         isPassed = false;
     }
     retval = testParseHeadFromString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "parser_test: testParseHeadFromString failed" << std::endl;
+        WLOG(LOG_INFO, "parser_test: testParseHeadFromString failed");
         isPassed = false;
     }
 
-    std::wcout << "parser_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    WLOG(LOG_INFO, "parser_test: done ", ((isPassed) ? "passed" : "failed"));
     return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }

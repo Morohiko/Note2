@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include "config.h"
+#include "log.h"
 
 Parser::Parser() {}
 
@@ -18,19 +19,19 @@ Parser::Parser() {}
  */
 int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &size) {
     int retval = 0;
-    std::wcout << LOG_DEBUG << "text.length() = " << text.length() << ", text = " << text << std::endl;
+    WLOG(LOG_DEBUG, "text.length() = ", text.length(), ", text = ", text);
     if (text.length()*2 < SIZE_OF_HEADER) {
-        std::wcout << LOG_ERROR << "cant parse head, string is corrupted: head = " << text << std::endl;
+        WLOG(LOG_ERROR, "cant parse head, string is corrupted: head = ", text);
         return STATUS_FAILURE;
     }
     retval = parseHeadFromStringGetDateString(text, date);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant parse head on get date step: head = " << text << std::endl;
+        WLOG(LOG_ERROR, "cant parse head on get date step: head = ", text);
         return retval;
     }
     retval = parseHeadFromStringGetSize(text, size);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant parse head on get size step: head = " << text << std::endl;
+        WLOG(LOG_ERROR, "cant parse head on get size step: head = ", text);
         return retval;
     }
     return retval;
@@ -46,11 +47,11 @@ int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &siz
  */
 int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &date) {
     if (text.length() < SIZE_OF_DATE ) {
-        std::wcout << LOG_ERROR << "cant parse time from header: text = " << text <<
-                      ", text.length = " << text.length() << std::endl;
+        WLOG(LOG_ERROR, "cant parse time from header: text = ", text,
+                      ", text.length = ", text.length());
         return STATUS_FAILURE;
     }
-    std::wcout << LOG_DEBUG << "text  = " << text << std::endl;
+    WLOG(LOG_DEBUG, "text  = ", text);
     date = text.substr(DATE_POSITION, SIZE_OF_DATE);
     return STATUS_SUCCESS;
 }
@@ -65,8 +66,8 @@ int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &d
  */
 int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &time) {
     if (text.length() < SIZE_OF_TIME) {
-        std::wcout << LOG_ERROR << "cant parse time from header: text = " << text <<
-        ", text.length = " << text.length() << std::endl;
+        WLOG(LOG_ERROR, "cant parse time from header: text = ", text,
+        ", text.length = ", text.length());
         return STATUS_FAILURE;
     }
     time = text.substr(TIME_POSITION, SIZE_OF_TIME);
@@ -83,31 +84,31 @@ int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &t
  */
 int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
     if (text.length()*2 < SIZE_OF_HEADER) {
-        std::wcout << LOG_ERROR << "header was broken: " <<
-                    "text.size = " << text.size() << std::endl;
+        WLOG(LOG_ERROR, "header was broken: ",
+                    "text.size = ", text.size());
         return STATUS_FAILURE;
     }
     std::wstring sizeString = text.substr(SIZE_POSITION, SIZE_OF_SIZE);
     if (sizeString.length() != SIZE_OF_SIZE) {
-        std::wcout << LOG_ERROR << "cant parse size from header: " <<
-            "sizeString.length() = " << sizeString.length() << 
-            ", sizeString = " << sizeString << std::endl;
+        WLOG(LOG_ERROR, "cant parse size from header: ",
+            "sizeString.length() = ", sizeString.length(),
+            ", sizeString = ", sizeString);
         return STATUS_FAILURE;
     }
     for (size_t i = 0; i < sizeString.length(); i++) {
         try {
             int tmp = std::stoi(sizeString.substr(i, i+1));
         } catch(std::invalid_argument& e){
-            std::wcout << LOG_ERROR << "cant parse size from header, corrupted data in header: " <<
-                "sizeString = " << sizeString << std::endl;
+            WLOG(LOG_ERROR, "cant parse size from header, corrupted data in header: ", 
+                "sizeString = ", sizeString);
             return STATUS_FAILURE;
         }
     }
     try {
         size = std::stoi(sizeString);
     } catch(std::invalid_argument& e){
-        std::wcout << LOG_ERROR << "cant parse size from header, corrupted data in header: " <<
-                "sizeString = " << sizeString << std::endl;
+        WLOG(LOG_ERROR, "cant parse size from header, corrupted data in header: ", 
+                "sizeString = ", sizeString);
         return STATUS_FAILURE;
     }
     return STATUS_SUCCESS;
@@ -143,7 +144,7 @@ int Parser::generateHead(std::wstring &currentDateTime, int size, std::wstring &
     int retval;
     retval = generateStringFromSize(size, sizeString);
     if (retval != STATUS_SUCCESS) {
-        std::wcout << LOG_ERROR << "cant generate string from size" << std::endl;
+        WLOG(LOG_ERROR, "cant generate string from size");
         return STATUS_FAILURE;
     }
     dest.append(currentDateTime);

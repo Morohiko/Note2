@@ -3,6 +3,7 @@
 
 #include "datetime.h"
 #include "config.h"
+#include "log.h"
 
 int testCurrentDateDateTimeString() {
     std::wstring text;
@@ -17,7 +18,7 @@ int testCurrentDateDateTimeString() {
     }
 
     retval = datetime.getCurrentDateTimeString(text);
-    std::wcout << "getCurrentDateTimeString: text = " << text << std::endl;
+    WLOG(LOG_INFO, "getCurrentDateTimeString: text = ", text);
 
     if (retval != STATUS_SUCCESS || text.length() != SIZE_OF_DATETIME) {
         return STATUS_TEST_FAILED;
@@ -63,16 +64,16 @@ int main() {
 
     retval = testCurrentDateDateTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "datetime_test: testCurrentDateDateTimeString failed" << std::endl;
+        WLOG(LOG_INFO, "datetime_test: testCurrentDateDateTimeString failed");
         isPassed = false;
     }
 
     retval = testCustomDateDateTimeString();
     if (retval != STATUS_SUCCESS) {
-        std::wcout << "datetime_test: testCustomDateDateTimeString failed" << std::endl;
+        WLOG(LOG_INFO, "datetime_test: testCustomDateDateTimeString failed");
         isPassed = false;
     }
 
-    std::wcout << "datetime_test: done " << ((isPassed) ? "passed" : "failed") << std::endl;
+    WLOG(LOG_INFO, "datetime_test: done ", ((isPassed) ? "passed" : "failed"));
     return (isPassed) ? STATUS_SUCCESS : STATUS_FAILURE;
 }
