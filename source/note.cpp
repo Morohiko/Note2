@@ -245,18 +245,19 @@ int Note::_findPositionByHeader(std::wstring &head, std::wstring &key, int &pos)
  * 
  * @return execution status
  */
-int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &pos) {
+int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &startPos, int &pos) {
     std::wstring dateBuff;
     int size = 0;
+    pos = startPos;
     do {
         std::wstring headerTmp;
         int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, headerTmp);
         if (retval != STATUS_SUCCESS) {
-            WLOG(LOG_WARN, "cant file date: ", date);
+            WLOG(LOG_WARN, "cant find date: ", date);
             return retval;
         }
         if (retval == STATUS_FAILURE) {
-            WLOG(LOG_ERROR, "cant file posinion, date: ", date);
+            WLOG(LOG_ERROR, "cant find posinion, date: ", date);
             return retval;
         }
         if (headerTmp.empty()) {
@@ -296,54 +297,6 @@ int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &pos) {
 
     // cant be reached there
     return STATUS_SUCCESS;
-}
-
-/**
- * @brief read body with head
- *
- * @param[in] head body whit this head will be read
- * @param[in] key using for decode data from file
- * @param[out] output container which will save body
- * 
- * @return execution status
- */
-int Note::_performReadBodyByHead(std::wstring &head, std::wstring &key, std::wstring &ouptut) {
-    int pos = 0;
-    int size = 0;
-    int retval;
-
-    retval = _findPositionByHeader(head, key, pos);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant find position by head");
-        return STATUS_FAILURE;
-    }
-
-    retval = parser.parseHeadFromStringGetSize(head, size);
-    if (retval != STATUS_SUCCESS) {
-        return STATUS_FAILURE;
-    }
-
-    pos += SIZE_OF_HEADER;
-    size -= SIZE_OF_HEADER;
-
-    retval = file.readFromFileByPosition(pos, size, ouptut);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "is not working");
-        return retval;
-    }
-
-#ifdef WITH_ENCODER
-    std::wstring decodedOuptut;
-    retval = encoder.decodeStringByKey(ouptut, key, decodedOuptut);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant decode body");
-        return STATUS_FAILURE;
-    }
-    ouptut.clear();
-    ouptut.append(decodedOuptut);
-#endif
-
-    return retval;
 }
 
 /**
@@ -441,11 +394,14 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
  */
 int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBody) {
     int pos = 0;
+    int retval;
+    int size = 0;
     std::wstring head;
     std::wstring time;
     std::wstring body;
     std::wstring dateString;
-    int retval;
+
+    outputBody.clear();
 
     retval = datetime.convertTmDateToString(date, dateString);
     if (retval != STATUS_SUCCESS) {
@@ -453,42 +409,75 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
         return STATUS_FAILURE;
     }
 
-    retval = _findPositionByDate(dateString, key, pos);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "failure on find position");
-        return retval;
-    }
-    WLOG(LOG_DEBUG, "date found");
-    retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "retval = ", retval);
-        return retval;
-    }
+    while (true) {
+        retval = _findPositionByDate(dateString, key, pos, pos);
+        if (retval == STATUS_END_OF_FILE) {
+            WLOG(LOG_INFO, "end of file");
+            retval = STATUS_SUCCESS;
+            break;
+        }
+
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cand find position by date");
+            return STATUS_FAILURE;
+        }
+
+        // read head
+        retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, head);
+        if (retval == STATUS_END_OF_FILE) {
+            WLOG(LOG_INFO, "end of file");
+            retval = STATUS_SUCCESS;
+            break;
+        }
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cant read from file by position: retval = ", retval);
+        }
+    #ifdef WITH_ENCODER
+        std::wstring decodedHead;
+        retval = encoder.decodeStringByKey(head, key, decodedHead);
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cant decode body");
+            return STATUS_FAILURE;
+        }
+        head = decodedHead;
+    #endif
+
+        retval = parser.parseHeadFromStringGetSize(head, size);
+        if (retval != STATUS_SUCCESS) {
+            return STATUS_FAILURE;
+        }
+
+        pos += SIZE_OF_HEADER;
+        size -= SIZE_OF_HEADER;
+
+        retval = file.readFromFileByPosition(pos, size, body);
+        if (retval == STATUS_END_OF_FILE) {
+            retval = STATUS_SUCCESS;
+            break;
+        }
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cant read from file by position");
+            return retval;
+        }
 
 #ifdef WITH_ENCODER
-    std::wstring decodedHead;
-    retval = encoder.decodeStringByKey(head, key, decodedHead);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant decode head on read by date");
-        return STATUS_FAILURE;
-    }
-    head.clear();
-    head.append(decodedHead);
+        std::wstring decodedBody;
+        retval = encoder.decodeStringByKey(body, key, decodedBody);
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cant decode body");
+            return STATUS_FAILURE;
+        }
+        body = decodedBody;
 #endif
 
-    retval = parser.parseHeadFromStringGetTimeString(head, time);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant get time from head");
-        return STATUS_FAILURE;
-    }
+        retval = parser.parseHeadFromStringGetTimeString(head, time);
+        if (retval != STATUS_SUCCESS) {
+            WLOG(LOG_ERROR, "cant parse time from head");
+            return retval;
+        }
 
-    retval = _performReadBodyByHead(head, key, body);
-    if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "failure on read body");
-        return retval;
+        pos += size;
+        outputBody.append(time + L'\n' + body + L"\n\n");
     }
-
-    outputBody.clear();
-    outputBody.append(time + L'\n' + body + L"\n\n");
-    return STATUS_SUCCESS;
+    return retval;
 }

@@ -105,18 +105,7 @@ private:
      * 
      * @return execution status
      */
-    int _findPositionByDate(std::wstring &date, std::wstring &key, int &pos);
-
-    /**
-     * @brief read body with head
-     *
-     * @param[in] head body whit this head will be read
-     * @param[in] key using for decode data from file
-     * @param[out] output container which will save body
-     * 
-     * @return execution status
-     */
-    int _performReadBodyByHead(std::wstring &head, std::wstring &key, std::wstring &output);
+    int _findPositionByDate(std::wstring &date, std::wstring &key, int &startPos, int &pos);
 
     /**
      * @brief check if key compares with file
