@@ -97,6 +97,7 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     fin.read((char*)&u16Bom[0], 2);
     bytes = fin.gcount();
     if (bytes == 0) {
+        fin.close();
         return STATUS_END_OF_FILE;
     }
     wchar_t sym = u16Bom.at(0);
@@ -109,6 +110,7 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     fin.read((char*)&u16[0], size*2);
     bytes = fin.gcount();
     if (bytes == 0) {
+        fin.close();
         return STATUS_END_OF_FILE;
     }
     output.resize(size);
