@@ -17,7 +17,7 @@ int Note::setFilenameHandler(QString &filename) {
 
 int Note::performReadByDateHandler(QDate &date, QString &key, QString &outputBody) {
     assert(note);
-    LOG(LOG_INFO, nullptr, nullptr);
+    WLOG(LOG_INFO, nullptr, nullptr);
     tm date_tm;
     int retval;
 
@@ -107,10 +107,10 @@ int Note::performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &d
  * @return execution status
  */
 int Note::setFilename(std::string &filename) {
-    LOG(LOG_INFO,"save file ", filename, " for read write data");
+    WLOG(LOG_INFO, "save file for read write data");
     int retval = file.setPathToFile(filename);
     if (retval != STATUS_SUCCESS) {
-        LOG(LOG_ERROR, "cant set filename: filename = ", filename);
+        WLOG(LOG_ERROR, "cant set filename");
     }
     return retval;
 }

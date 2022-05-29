@@ -37,7 +37,7 @@ int File::isFileExists(const std::string &filename) {
 int File::setPathToFile(std::string &src) {
     int retval = isFileExists(src);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        LOG(LOG_ERROR, "setPathToFile file with this->path is not exist ", src);
+        WLOG(LOG_ERROR, "setPathToFile file with this->path is not exist ");
         return STATUS_FILE_NOT_FOUND;
     }
     this->path = src;
@@ -81,7 +81,7 @@ int File::writeToEndFile(std::wstring &src) {
 int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     int retval = isFileExists(this->path);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        LOG(LOG_ERROR, "file with this->path is not exist ", this->path);
+        WLOG(LOG_ERROR, "file with this->path is not exist ");
         return STATUS_FILE_NOT_FOUND;
     }
     std::string filename(this->path.length(), '\0');

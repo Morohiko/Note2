@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 
+// header config
 #define SIZE_OF_HEADER 24
 #define DATE_POSITION 0
 #define SIZE_OF_DATE 10
@@ -13,8 +14,9 @@
 #define SIZE_OF_DATETIME 16
 #define SIZE_POSITION 17
 #define SIZE_OF_SIZE 6
-#define WITH_ENCODER
 
+// endcoder
+#define WITH_ENCODER
 #define UNICODE
 #ifdef UNICODE
     #define CODEC_UTF_16
