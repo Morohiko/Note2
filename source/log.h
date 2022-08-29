@@ -29,7 +29,7 @@ static inline std::wstring getLogLevelStr(int &log_level) {
 
 #define LOG_FORMAT LOG_LEVEL_ONLY_LOG_FORMAT
 
-static int CURRENT_LOG_LEVEL = LOG_DEBUG;
+static int CURRENT_LOG_LEVEL = LOG_INFO;
 
 template <typename Arg, typename... Args>
 void doWCoutPrint(int logLevel, Arg&& arg, Args&&... args) {
