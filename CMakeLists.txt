@@ -56,28 +56,6 @@ message("PLATFORM: " ${PLATFORM})
 target_link_libraries(${PROJECT_NAME} ${NOTE_LIB_NAME})
 
 if (${WITH_TESTS})
-    set(PARSER_TEST_NAME "parser_test")
-    add_executable(${PARSER_TEST_NAME} test/parser_test/main.cpp)
-    target_link_libraries(${PARSER_TEST_NAME} ${NOTE_LIB_NAME})
-
-    set(DATETIME_TEST_NAME "datetime_test")
-    add_executable(${DATETIME_TEST_NAME} test/datetime_test/main.cpp)
-    target_link_libraries(${DATETIME_TEST_NAME} ${NOTE_LIB_NAME})
-
-    set(FILE_TEST_NAME "file_test")
-    add_executable(${FILE_TEST_NAME} test/file_test/main.cpp)
-    target_link_libraries(${FILE_TEST_NAME} ${NOTE_LIB_NAME})
-
-    set(LOGGER_TEST_NAME "logger_test")
-    add_executable(${LOGGER_TEST_NAME} test/logger_test/main.cpp)
-    target_link_libraries(${LOGGER_TEST_NAME} ${NOTE_LIB_NAME})
-
-    if (${PLATFORM} STREQUAL "dummy")
-        set(DUMMY_TEST_NAME "dummy_test")
-        add_executable(${DUMMY_TEST_NAME} platforms/dummy/dummy.cpp test/dummy_test/main.cpp)
-        target_link_libraries(${DUMMY_TEST_NAME} ${NOTE_LIB_NAME})
-    endif()
-
     # gtest
     enable_testing()
     add_subdirectory(tests)
