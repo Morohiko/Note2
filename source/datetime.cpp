@@ -3,6 +3,7 @@
 
 #include "datetime.h"
 #include "config.h"
+#include "log.h"
 
 // getCurrentDateString: "yyyy/MM/dd"
 // getCurrentDateTimeString: "yyyy/MM/dd.hh:mm"
@@ -123,7 +124,13 @@ int DateTime::getCurrentDateTimeString(std::wstring &dest) {
  */
 int DateTime::convertTmDateToString(tm &tm, std::wstring &dest) {
     dest.clear();
+    if (tm.tm_year < 0 || tm.tm_mon < 0 || tm.tm_mday < 0 || tm.tm_hour < 0 || tm.tm_min < 0) {
+        WLOG(LOG_ERROR, "tm struct is corrupted");
+        return STATUS_FAILURE;
+    }
+
     std::wstring year = std::to_wstring(tm.tm_year);
+    WLOG(LOG_WARN, "year = ", year);
     while (year.length() < 4) {
         year.insert(0, L"0");
     }

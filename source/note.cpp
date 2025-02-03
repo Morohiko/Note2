@@ -257,7 +257,7 @@ int Note::_findPositionByDate(std::wstring &date, std::wstring &key, int &startP
             return retval;
         }
         if (retval == STATUS_FAILURE) {
-            WLOG(LOG_ERROR, "cant find posinion, date: ", date);
+            WLOG(LOG_ERROR, "cant find position, date: ", date);
             return retval;
         }
         if (headerTmp.empty()) {
@@ -310,6 +310,10 @@ bool Note::_isValidKey(std::wstring &key) {
     std::wstring buff;
     int pos = 0; int size;
     std::wstring date_str;
+    if (key.empty()) {
+        WLOG(LOG_ERROR, "key is empty");
+        return false;
+    }
     if (file.isCurrentFileEmpty()) {
         WLOG(LOG_ERROR, "file is empty");
         return true;
@@ -317,7 +321,7 @@ bool Note::_isValidKey(std::wstring &key) {
     int retval = file.readFromFileByPosition(pos, SIZE_OF_HEADER, buff);
     if (retval != STATUS_SUCCESS) {
         WLOG(LOG_ERROR, "isValidKey/readFromFileByPosition: retval = ", retval);
-        return STATUS_FAILURE;
+        return false;
     }
 
 #ifdef WITH_ENCODER
@@ -350,6 +354,11 @@ int Note::performReadAllDate(std::wstring &key, std::list<std::wstring> &dateLis
     std::wstring buff;
     std::wstring date;
     int retval;
+
+    if (!_isValidKey(key)) {
+        WLOG(LOG_ERROR, "key is not valid");
+        return STATUS_FAILURE;
+    }
 
     do {
         buff.clear();
@@ -432,7 +441,7 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
         if (retval != STATUS_SUCCESS) {
             WLOG(LOG_ERROR, "cant read from file by position: retval = ", retval);
         }
-    #ifdef WITH_ENCODER
+#ifdef WITH_ENCODER
         std::wstring decodedHead;
         retval = encoder.decodeStringByKey(head, key, decodedHead);
         if (retval != STATUS_SUCCESS) {
@@ -440,7 +449,7 @@ int Note::performReadByDate(tm &date, std::wstring &key, std::wstring &outputBod
             return STATUS_FAILURE;
         }
         head = decodedHead;
-    #endif
+#endif
 
         retval = parser.parseHeadFromStringGetSize(head, size);
         if (retval != STATUS_SUCCESS) {

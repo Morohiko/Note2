@@ -32,4 +32,21 @@
 #define STATUS_FILE_NOT_FOUND 11
 #define STATUS_TEST_FAILED 20
 
+static inline std::string status_str(int status) {
+    switch (status) {
+        case STATUS_SUCCESS:
+            return "STATUS_SUCCESS";
+        case STATUS_FAILURE:
+            return "STATUS_FAILURE";
+        case STATUS_END_OF_FILE:
+            return "STATUS_END_OF_FILE";
+        case STATUS_FILE_NOT_FOUND:
+            return "STATUS_FILE_NOT_FOUND";
+        case STATUS_TEST_FAILED:
+            return "STATUS_TEST_FAILED";
+        default:
+            return "UNKNOWN STATUS";
+    }
+}
+
 #endif // CONFIG_H

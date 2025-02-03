@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(PLATFORM "linux" CACHE STRING "Platform for build (linux)")
-option(WITH_TESTS "build tests" OFF)
+option(WITH_TESTS "build tests" ON)
 
 # build note_lib
 include_directories(source)
@@ -77,4 +77,8 @@ if (${WITH_TESTS})
         add_executable(${DUMMY_TEST_NAME} platforms/dummy/dummy.cpp test/dummy_test/main.cpp)
         target_link_libraries(${DUMMY_TEST_NAME} ${NOTE_LIB_NAME})
     endif()
+
+    # gtest
+    enable_testing()
+    add_subdirectory(tests)
 endif()
