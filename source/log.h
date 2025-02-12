@@ -4,45 +4,53 @@
 #include <iostream>
 #include <string>
 
-#define LOG_ERROR 0
-#define LOG_WARN 1
-#define LOG_INFO 2
-#define LOG_DEBUG 3
+// Enum class for log levels to provide type safety
+enum class LogLevel {
+    ERROR = 0,
+    WARN = 1,
+    INFO = 2,
+    DEBUG = 3
+};
 
-static inline std::wstring getLogLevelStr(int &log_level) {
-    switch(log_level) {
-        case LOG_ERROR:
-            return L"LOG_ERROR";
-        case LOG_WARN:
-            return L"LOG_WARN";
-        case LOG_INFO:
-            return L"LOG_INFO";
-        case LOG_DEBUG:
-            return L"LOG_DEBUG";
-    default: 
-        return L"NO_LOG_LEVEL";
-    }
-}
-#define FULL_LOG_FORMAT __FILE__ << ":" << __LINE__ << ":" << __func__ << ": "
-#define LOG_LEVEL_ONLY_LOG_FORMAT "" << getLogLevelStr(logLevel) << ": "
-#define NO_LOG_FORMAT ""
-
-#define LOG_FORMAT LOG_LEVEL_ONLY_LOG_FORMAT
-
-static int CURRENT_LOG_LEVEL = LOG_INFO;
-
-template <typename Arg, typename... Args>
-void doWCoutPrint(int logLevel, Arg&& arg, Args&&... args) {
-    if (logLevel <= CURRENT_LOG_LEVEL) {
-        std::wcout << LOG_FORMAT;
-        if (arg != nullptr) {
-            std::wcout << std::forward<Arg>(arg);
-            ((std::wcout << ' ' << std::forward<Args>(args)), ...);
+class Logger {
+public:
+    static LogLevel currentLevel;
+    
+    static std::wstring getLogLevelStr(LogLevel level) {
+        switch(level) {
+            case LogLevel::ERROR:
+                return L"ERROR";
+            case LogLevel::WARN:
+                return L"WARN";
+            case LogLevel::INFO:
+                return L"INFO";
+            case LogLevel::DEBUG:
+                return L"DEBUG";
+            default: 
+                return L"UNKNOWN";
         }
-        std::wcout << std::endl;
     }
-}
 
-#define WLOG doWCoutPrint
+    static void setLogLevel(LogLevel level) {
+        currentLevel = level;
+    }
+
+    template <typename... Args>
+    static void log(LogLevel level, Args&&... args) {
+        if (static_cast<int>(level) <= static_cast<int>(currentLevel)) {
+            std::wcout << getLogLevelStr(level) << L": ";
+            (std::wcout << ... << std::forward<Args>(args)) << std::endl;
+        }
+    }
+};
+
+// Initialize static member
+inline LogLevel Logger::currentLevel = LogLevel::DEBUG;
+
+// Convenience macros
+#define LOG_ERROR(...) Logger::log(LogLevel::ERROR, __VA_ARGS__)
+#define LOG_WARN(...)  Logger::log(LogLevel::WARN, __VA_ARGS__)
+#define LOG_INFO(...)  Logger::log(LogLevel::INFO, __VA_ARGS__)
+#define LOG_DEBUG(...) Logger::log(LogLevel::DEBUG, __VA_ARGS__)
 
 #endif // LOG_H

@@ -19,19 +19,19 @@ Parser::Parser() {}
  */
 int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &size) {
     int retval = 0;
-    WLOG(LOG_DEBUG, "text.length() = ", text.length(), ", text = ", text);
+    LOG_DEBUG("text.length() = ", text.length(), ", text = ", text);
     if (text.length()*2 < SIZE_OF_HEADER) {
-        WLOG(LOG_ERROR, "cant parse head, string is corrupted: head = ", text);
+        LOG_ERROR("cant parse head, string is corrupted: head = ", text);
         return STATUS_FAILURE;
     }
     retval = parseHeadFromStringGetDateString(text, date);
     if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant parse head on get date step: head = ", text);
+        LOG_ERROR("cant parse head on get date step: head = ", text);
         return retval;
     }
     retval = parseHeadFromStringGetSize(text, size);
     if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant parse head on get size step: head = ", text);
+        LOG_ERROR("cant parse head on get size step: head = ", text);
         return retval;
     }
     return retval;
@@ -47,11 +47,11 @@ int Parser::parseHeadFromString(std::wstring &text, std::wstring &date, int &siz
  */
 int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &date) {
     if (text.length() < SIZE_OF_DATE ) {
-        WLOG(LOG_ERROR, "cant parse time from header: text = ", text,
+        LOG_ERROR("cant parse time from header: text = ", text,
                       ", text.length = ", text.length());
         return STATUS_FAILURE;
     }
-    WLOG(LOG_DEBUG, "text  = ", text);
+    LOG_DEBUG("text  = ", text);
     date = text.substr(DATE_POSITION, SIZE_OF_DATE);
     return STATUS_SUCCESS;
 }
@@ -66,7 +66,7 @@ int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &d
  */
 int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &time) {
     if (text.length() < SIZE_OF_TIME) {
-        WLOG(LOG_ERROR, "cant parse time from header: text = ", text,
+        LOG_ERROR("cant parse time from header: text = ", text,
         ", text.length = ", text.length());
         return STATUS_FAILURE;
     }
@@ -84,13 +84,13 @@ int Parser::parseHeadFromStringGetTimeString(std::wstring &text, std::wstring &t
  */
 int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
     if (text.length()*2 < SIZE_OF_HEADER) {
-        WLOG(LOG_ERROR, "header was broken: ",
+        LOG_ERROR("header was broken: ",
                     "text.size = ", text.size());
         return STATUS_FAILURE;
     }
     std::wstring sizeString = text.substr(SIZE_POSITION, SIZE_OF_SIZE);
     if (sizeString.length() != SIZE_OF_SIZE) {
-        WLOG(LOG_ERROR, "cant parse size from header: ",
+        LOG_ERROR("cant parse size from header: ",
             "sizeString.length() = ", sizeString.length(),
             ", sizeString = ", sizeString);
         return STATUS_FAILURE;
@@ -99,7 +99,7 @@ int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
         try {
             int tmp = std::stoi(sizeString.substr(i, i+1));
         } catch(std::invalid_argument& e){
-            WLOG(LOG_ERROR, "cant parse size from header, corrupted data in header: ", 
+            LOG_ERROR("cant parse size from header, corrupted data in header: ", 
                 "sizeString = ", sizeString);
             return STATUS_FAILURE;
         }
@@ -107,7 +107,7 @@ int Parser::parseHeadFromStringGetSize(std::wstring &text, int &size) {
     try {
         size = std::stoi(sizeString);
     } catch(std::invalid_argument& e){
-        WLOG(LOG_ERROR, "cant parse size from header, corrupted data in header: ", 
+        LOG_ERROR("cant parse size from header, corrupted data in header: ", 
                 "sizeString = ", sizeString);
         return STATUS_FAILURE;
     }
@@ -144,7 +144,7 @@ int Parser::generateHead(std::wstring &currentDateTime, int size, std::wstring &
     int retval;
     retval = generateStringFromSize(size, sizeString);
     if (retval != STATUS_SUCCESS) {
-        WLOG(LOG_ERROR, "cant generate string from size");
+        LOG_ERROR("cant generate string from size");
         return STATUS_FAILURE;
     }
     dest.append(currentDateTime);

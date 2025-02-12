@@ -37,7 +37,7 @@ int File::isFileExists(const std::string &filename) {
 int File::setPathToFile(std::string &src) {
     int retval = isFileExists(src);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        WLOG(LOG_ERROR, "setPathToFile file with this->path is not exist ");
+        LOG_ERROR("setPathToFile file with this->path is not exist ");
         return STATUS_FILE_NOT_FOUND;
     }
     this->path = src;
@@ -53,7 +53,7 @@ int File::setPathToFile(std::string &src) {
  */
 int File::writeToEndFile(std::wstring &src) {
     if (this->path.size() < 1) {
-        WLOG(LOG_ERROR, "qwriteToEndFile this->path == nullptr");
+        LOG_ERROR("qwriteToEndFile this->path == nullptr");
         return STATUS_FAILURE;
     }
     std::string filename(this->path.length(), '\0');
@@ -81,7 +81,7 @@ int File::writeToEndFile(std::wstring &src) {
 int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     int retval = isFileExists(this->path);
     if (retval == STATUS_FILE_NOT_FOUND) {
-        WLOG(LOG_ERROR, "file with this->path is not exist ");
+        LOG_ERROR("file with this->path is not exist ");
         return STATUS_FILE_NOT_FOUND;
     }
     std::string filename(this->path.length(), '\0');
@@ -102,7 +102,7 @@ int File::readFromFileByPosition(int &pos, int size, std::wstring &output) {
     }
     wchar_t sym = u16Bom.at(0);
     if ((int)sym == 0xfeff || (int(sym) == 0xfffe)) {
-        WLOG(LOG_DEBUG, "skip BOM");
+        LOG_DEBUG("skip BOM");
         pos++;
     }
     fin.seekg(pos*2, std::ios::beg);

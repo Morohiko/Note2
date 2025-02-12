@@ -9,6 +9,6 @@ int main() {
     Dummy dummy;
     dummy.setCallbacks(Note::setFilenameHandler, Note::performReadByDateHandler,
                        Note::performReadAllDateHandler, Note::performWriteToFileHandler);
-    WLOG(LOG_INFO, "hello from dummy");
+    LOG_INFO("hello from dummy");
     return STATUS_SUCCESS;
 }
