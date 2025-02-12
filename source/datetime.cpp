@@ -115,7 +115,7 @@ int DateTime::getCurrentDateTimeString(std::wstring &dest) {
 
 /**
  * @brief convert tm struct to wstring in datetime convention
- *        format: yyyy/MM/dd.hh:mm
+ *        format: yyyy/MM/dd
  * 
  * @param[in] tm datetime struct, will be saved to datetime field
  * @param[out] dest container for getting converted date/time
@@ -124,7 +124,7 @@ int DateTime::getCurrentDateTimeString(std::wstring &dest) {
  */
 int DateTime::convertTmDateToString(tm &tm, std::wstring &dest) {
     dest.clear();
-    if (tm.tm_year < 0 || tm.tm_mon < 0 || tm.tm_mday < 0 || tm.tm_hour < 0 || tm.tm_min < 0) {
+    if (tm.tm_year < 0 || tm.tm_mon < 0 || tm.tm_mday < 0) {
         WLOG(LOG_ERROR, "tm struct is corrupted");
         return STATUS_FAILURE;
     }
