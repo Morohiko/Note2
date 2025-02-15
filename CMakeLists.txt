@@ -38,8 +38,8 @@ if (${PLATFORM} STREQUAL "linux")
                     platforms/qt/mainwindow.cpp
                     platforms/qt/treeitem.cpp)
 
-    target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core)
     target_link_libraries(${NOTE_LIB_NAME} Qt5::Core)
+    target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core ${NOTE_LIB_NAME})
 
 elseif(${PLATFORM} STREQUAL "dummy")
     add_definitions(-DUSE_DUMMY)
@@ -47,13 +47,23 @@ elseif(${PLATFORM} STREQUAL "dummy")
     add_executable(${PROJECT_NAME}
                     platforms/dummy/main.cpp
                     platforms/dummy/dummy.cpp)
+    target_link_libraries(${PROJECT_NAME} ${NOTE_LIB_NAME})
+
+elseif(${PLATFORM} STREQUAL "android")
+    add_custom_target(run ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "Running build_and_install.sh..."
+        COMMAND ${CMAKE_SOURCE_DIR}/platforms/android/build_install.sh
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/platforms/android
+        COMMENT "Building app and installing to connected device"
+        VERBATIM
+    )
+    add_definitions(-DUSE_ANDROID)
 else()
-    message(FATAL_ERROR "platform is not supported, please use linux, dummy")
+    message(FATAL_ERROR "platform is not supported")
 endif()
 
 message("PLATFORM: " ${PLATFORM})
 
-target_link_libraries(${PROJECT_NAME} ${NOTE_LIB_NAME})
 
 if (${WITH_TESTS})
     # gtest
