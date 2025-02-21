@@ -1,12 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/activityMain"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello from Java!"
-        android:layout_centerInParent="true" />
-</RelativeLayout>
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Multi-line text field -->
+        <EditText
+            android:id="@+id/textEdit"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:hint="Enter text here" />
+
+        <!-- Label to show text length -->
+        <TextView
+            android:id="@+id/labeldbg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0/999999"
+            android:layout_marginTop="8dp" />
+
+        <!-- Write Button -->
+        <Button
+            android:id="@+id/btnWrite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Write"
+            android:layout_marginTop="8dp" />
+
+        <!-- Open File Button -->
+        <Button
+            android:id="@+id/btnOpen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open File"
+            android:layout_marginTop="8dp" />
+
+        <!-- Read Button -->
+        <Button
+            android:id="@+id/btnRead"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Read"
+            android:layout_marginTop="8dp" />
+
+        <!-- Key (password) field -->
+        <EditText
+            android:id="@+id/editKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter key/password"
+            android:inputType="textPassword"
+            android:layout_marginTop="8dp" />
+
+        <!-- Custom Time field and CheckBox -->
+        <LinearLayout
+            android:id="@+id/timeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/editCustomTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Custom Time" />
+
+            <CheckBox
+                android:id="@+id/checkBoxCustomTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- ListView to simulate the tree widget -->
+        <ListView
+            android:id="@+id/treeView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -4,13 +4,13 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 # Define the project name.
-project("note2_lib")
+project("note_andr_lib")
 
 # Add the native library. The library name here must match the one you load in Java (System.loadLibrary("native-lib")).
 add_library(
-        note2_lib           # Library name.
+        note_andr_lib           # Library name.
         SHARED               # Build as a shared library.
-        note2_lib.cpp       # Source file.
+        note_andr_lib.cpp       # Source file.
 )
 
 # Find libraries included in the NDK (e.g., log).
@@ -21,6 +21,6 @@ find_library(
 
 # Link the log library to native-lib.
 target_link_libraries(
-        note2_lib
+        note_andr_lib
         ${log-lib}
 )
