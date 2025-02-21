@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "treeitem.h"
+#include "converter.h"
 
 #include <QDebug>
 #include "QFileDialog"
@@ -51,7 +52,10 @@ void MainWindow::slotForWriteButton() {
     bool isCheckBox = this->isCheckedCheckBoxCustomTime();
     QDateTime datetime = this->getCustomDateTime();
     QString key = getKey();
-    int stat = performWriteToFileHandler(text, isCheckBox, datetime, key);
+    std::wstring wtext = Converter::toStdWString(text);
+    std::wstring wkey = Converter::toStdWString(key);
+    tm datetime_tm = Converter::dateTimeToTm(datetime);
+    int stat = performWriteToFileHandler(wtext, isCheckBox, datetime_tm, wkey);
     if (stat) {
         setColorForPushButton(btnWrite, QColor(Qt::red));
     } else {
@@ -65,7 +69,8 @@ void MainWindow::slotForOpenButton() {
 
     int retval = 0;
     if (filename.size() >= 1 || filename != nullptr) {
-        retval = setFilenameHandler(filename);
+        std::string sfilename = Converter::toStdString(filename);
+        retval = setFilenameHandler(sfilename);
     } else {
         retval = -1;
     }
@@ -82,11 +87,13 @@ void MainWindow::readByTreeWidgetItem(QTreeWidgetItem *item) {
     year = item->parent()->parent()->text(1).toInt();
     qDebug() << "installConnect item->text = year:" << year << "month:" << month << "day:" << day;
     QDate date(year, month, day);
-    QString text;
     QString key = getKey();
-    performReadByDateHandler(date, key, text);
+    std::wstring output;
+    tm date_tm = Converter::dateToTm(date);
+    std::wstring wkey = Converter::toStdWString(key);
+    performReadByDateHandler(date_tm, wkey, output);
     textEdit->clear();
-    textEdit->setText(text);
+    textEdit->setText(Converter::toQString(output));
 }
 
 void MainWindow::expandedTreeWidgetItem(QTreeWidgetItem *item) {
@@ -97,8 +104,10 @@ void MainWindow::expandedTreeWidgetItem(QTreeWidgetItem *item) {
 void MainWindow::slotForReadButton() {
     QList<QDate *> dateList;
     QString key = getKey();
+    std::wstring stdkey = Converter::toStdWString(key);
 
-    if (performReadAllDateHandler(key, dateList) == 0) {
+    std::list<std::wstring> list;
+    if (performReadAllDateHandler(stdkey, list) == 0) {
         setColorForPushButton(btnRead, QColor(Qt::green));
         qDebug() << "DEBUG performReadAllDatetime is good";
     } else {
@@ -106,6 +115,14 @@ void MainWindow::slotForReadButton() {
         qDebug() << "DEBUG performReadAllDatetime <= 0";
         return;
     }
+
+    std::list<std::wstring>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it){
+        QString qstring = QString::fromStdWString(*it);
+        QDate *qdate = new QDate(QDate::fromString(qstring, QString("yyyy/M/dd")));
+        dateList.append(qdate);
+    }
+
     treeItem->fillTreeByDateList(&dateList);
 
     connect(ui->treeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(readByTreeWidgetItem(QTreeWidgetItem *)));
@@ -146,10 +163,10 @@ void MainWindow::setColorForPushButton(QPushButton *btn, QColor color) {
     btn->update();
 }
 
-void MainWindow::setCallbacks(int (*setFilename)(QString &filename),
-                              int (*performReadByDate)(QDate &date, QString &key, QString &outputBody),
-                              int (*performReadAllDate)(QString &key, QList<QDate *> &dateList),
-                              int (*performWriteToFile)(QString &text, bool isCustomTime, QDateTime &datetime, QString &key)) {
+void MainWindow::setCallbacks(int (*setFilename)(std::string &filename),
+                              int (*performReadByDate)(tm &date, std::wstring &key, std::wstring &outputBody),
+                              int (*performReadAllDate)(std::wstring &key, std::list<std::wstring> &dateList),
+                              int (*performWriteToFile)(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key)) {
     setFilenameHandler = setFilename;
     performReadByDateHandler = performReadByDate;
     performReadAllDateHandler = performReadAllDate;

@@ -14,7 +14,7 @@ add_executable(NoteTest
 
 target_link_libraries(NoteTest
     gtest_main
-    ${NOTE_LIB_NAME}
+    note_lib
 )
 
 # Include the gtest headers

@@ -1,7 +1,7 @@
 # File: app/src/main/cpp/CMakeLists.txt
 
 # Set the minimum version of CMake required.
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.1.0)
 
 # Define the project name.
 project("note_andr_lib")

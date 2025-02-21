@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 
 set(PROJECT_NAME "note2")
-set(NOTE_LIB_NAME "note_lib")
 
 project(${PROJECT_NAME} VERSION 1.0.0 LANGUAGES CXX)
 
@@ -13,19 +12,10 @@ option(WITH_TESTS "build tests" ON)
 
 # build note_lib
 include_directories(source)
-
-add_library(${NOTE_LIB_NAME}
-            source/parser.cpp
-            source/file.cpp
-            source/note.cpp
-            source/encoder.cpp
-            source/datetime.cpp
-)
+add_subdirectory(source)
 
 # build bin for target
 if (${PLATFORM} STREQUAL "linux")
-    add_definitions(-DUSE_QT)
-
     find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
     set(CMAKE_AUTOMOC ON)
@@ -39,15 +29,14 @@ if (${PLATFORM} STREQUAL "linux")
                     platforms/qt/treeitem.cpp)
 
     target_link_libraries(${NOTE_LIB_NAME} Qt5::Core)
-    target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core ${NOTE_LIB_NAME})
+    target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Core note_lib)
 
 elseif(${PLATFORM} STREQUAL "dummy")
-    add_definitions(-DUSE_DUMMY)
     include_directories(platforms/dummy)
     add_executable(${PROJECT_NAME}
                     platforms/dummy/main.cpp
                     platforms/dummy/dummy.cpp)
-    target_link_libraries(${PROJECT_NAME} ${NOTE_LIB_NAME})
+    target_link_libraries(${PROJECT_NAME} note_lib)
 
 elseif(${PLATFORM} STREQUAL "android")
     add_custom_target(run ALL
@@ -57,7 +46,6 @@ elseif(${PLATFORM} STREQUAL "android")
         COMMENT "Building app and installing to connected device"
         VERBATIM
     )
-    add_definitions(-DUSE_ANDROID)
 else()
     message(FATAL_ERROR "platform is not supported")
 endif()

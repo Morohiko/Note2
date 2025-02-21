@@ -8,72 +8,6 @@ Note::Note() {
     note = this;
 }
 
-#ifdef USE_QT
-int Note::setFilenameHandler(QString &filename) {
-    LOG_INFO(nullptr, nullptr);
-    std::string filename_std = filename.toStdString();
-    return note->setFilename(filename_std);
-}
-
-int Note::performReadByDateHandler(QDate &date, QString &key, QString &outputBody) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    tm date_tm;
-    int retval;
-
-    date_tm.tm_year = date.year();
-    date_tm.tm_mon = date.month();
-    date_tm.tm_mday = date.day();
-    std::wstring textStd;
-    std::wstring keyStd = key.toStdWString();
-    retval = note->performReadByDate(date_tm, keyStd, textStd);
-    if (retval != STATUS_SUCCESS) {
-        LOG_ERROR("cant perform read by date");
-    }
-    outputBody = QString::fromStdWString(textStd);
-    return STATUS_SUCCESS;
-}
-
-int Note::performReadAllDateHandler(QString &key, QList<QDate *> &dateList) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    std::list<std::wstring> list;
-    std::wstring stdKey = key.toStdWString();
-    int retval = note->performReadAllDate(stdKey, list);
-    if (retval != STATUS_SUCCESS) {
-        LOG_ERROR("cant read all date from file");
-        return STATUS_FAILURE;
-    }
-    std::list<std::wstring>::iterator it;
-    for (it = list.begin(); it != list.end(); ++it){
-        QString qstring = QString::fromStdWString(*it);
-        QDate *qdate = new QDate(QDate::fromString(qstring, QString("yyyy/M/dd")));
-        dateList.append(qdate);
-    }
-    return STATUS_SUCCESS;
-}
-
-int Note::performWriteToFileHandler(QString &text, bool isCustomTime, QDateTime &datetime, QString &key) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    std::wstring stdText = text.toStdWString();
-    std::wstring stdKey = key.toStdWString();
-    tm date_time_tm;
-    date_time_tm.tm_year = datetime.date().year();
-    date_time_tm.tm_mon = datetime.date().month();
-    date_time_tm.tm_mday = datetime.date().day();
-    date_time_tm.tm_hour = datetime.time().hour();
-    date_time_tm.tm_min = datetime.time().minute();
-    date_time_tm.tm_sec = datetime.time().second();
-    return note->performWriteToFile(stdText, isCustomTime, date_time_tm, stdKey);
-}
-#endif
-
-#ifdef USE_ANDROID
-// TODO: android api
-#endif
-
-#ifdef USE_DUMMY
 int Note::setFilenameHandler(std::string &filename) {
     assert(note);
     LOG_INFO(nullptr, nullptr);
@@ -97,7 +31,6 @@ int Note::performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &d
     LOG_INFO(nullptr, nullptr);
     return note->performWriteToFile(text, isCustomTime, datetime, key);
 }
-#endif
 
 /**
  * @brief save filename of file for read/write data
