@@ -55,7 +55,7 @@ void MainWindow::slotForWriteButton() {
     std::wstring wtext = Converter::toStdWString(text);
     std::wstring wkey = Converter::toStdWString(key);
     tm datetime_tm = Converter::dateTimeToTm(datetime);
-    int stat = performWriteToFileHandler(wtext, isCheckBox, datetime_tm, wkey);
+    int stat = performWriteToFile(wtext, isCheckBox, datetime_tm, wkey);
     if (stat) {
         setColorForPushButton(btnWrite, QColor(Qt::red));
     } else {
@@ -70,7 +70,7 @@ void MainWindow::slotForOpenButton() {
     int retval = 0;
     if (filename.size() >= 1 || filename != nullptr) {
         std::string sfilename = Converter::toStdString(filename);
-        retval = setFilenameHandler(sfilename);
+        retval = this->setFilename(sfilename);
     } else {
         retval = -1;
     }
@@ -91,7 +91,7 @@ void MainWindow::readByTreeWidgetItem(QTreeWidgetItem *item) {
     std::wstring output;
     tm date_tm = Converter::dateToTm(date);
     std::wstring wkey = Converter::toStdWString(key);
-    performReadByDateHandler(date_tm, wkey, output);
+    performReadByDate(date_tm, wkey, output);
     textEdit->clear();
     textEdit->setText(Converter::toQString(output));
 }
@@ -107,7 +107,7 @@ void MainWindow::slotForReadButton() {
     std::wstring stdkey = Converter::toStdWString(key);
 
     std::list<std::wstring> list;
-    if (performReadAllDateHandler(stdkey, list) == 0) {
+    if (performReadAllDate(stdkey, list) == 0) {
         setColorForPushButton(btnRead, QColor(Qt::green));
         qDebug() << "DEBUG performReadAllDatetime is good";
     } else {
@@ -161,16 +161,6 @@ void MainWindow::setColorForPushButton(QPushButton *btn, QColor color) {
     btn->setAutoFillBackground(true);
     btn->setPalette(pal);
     btn->update();
-}
-
-void MainWindow::setCallbacks(int (*setFilename)(std::string &filename),
-                              int (*performReadByDate)(tm &date, std::wstring &key, std::wstring &outputBody),
-                              int (*performReadAllDate)(std::wstring &key, std::list<std::wstring> &dateList),
-                              int (*performWriteToFile)(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key)) {
-    setFilenameHandler = setFilename;
-    performReadByDateHandler = performReadByDate;
-    performReadAllDateHandler = performReadAllDate;
-    performWriteToFileHandler = performWriteToFile;
 }
 
 QString MainWindow::getKey() {

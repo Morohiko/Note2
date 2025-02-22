@@ -4,34 +4,6 @@
 #include "note.h"
 #include "log.h"
 
-Note::Note() {
-    note = this;
-}
-
-int Note::setFilenameHandler(std::string &filename) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    return note->setFilename(filename);
-}
-
-int Note::performReadByDateHandler(tm &date, std::wstring &key, std::wstring &outputBody) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    return note->performReadByDate(date, key, outputBody);
-}
-
-int Note::performReadAllDateHandler(std::wstring &key, std::list<std::wstring> &dateList) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    return note->performReadAllDate(key, dateList);
-}
-
-int Note::performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key) {
-    assert(note);
-    LOG_INFO(nullptr, nullptr);
-    return note->performWriteToFile(text, isCustomTime, datetime, key);
-}
-
 /**
  * @brief save filename of file for read/write data
  *

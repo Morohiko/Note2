@@ -1,21 +1,46 @@
 #include <jni.h>
 #include <string>
 
-// Example function from your "C++ library" (here simulated inline)
-std::string getGreeting() {
-    return "Hello from C++!";
-}
-
 // Implementation of the native method called from Java.
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_example_note2_MainActivity_stringFromJNI(JNIEnv* env, jobject /* this */) {
-    // Call the example C++ function.
-    std::string greeting = getGreeting();
-
-    // Optionally add some additional text.
-    std::string fullGreeting = "Native library says: " + greeting;
-
-    // Return the result as a jstring.
-    return env->NewStringUTF(fullGreeting.c_str());
+extern "C" {
+/*
+ * Class:     com_example_note2_MainActivity
+ * Method:    _setFilename
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_com_example_note2_MainActivity__1setFilename(JNIEnv* env, jobject, jstring filename) {
+    return 0;
 }
+
+/*
+ * Class:     com_example_note2_MainActivity
+ * Method:    _performReadAllDates
+ * Signature: (Ljava/lang/String;Ljava/util/List;)I
+ */
+JNIEXPORT jint JNICALL
+Java_com_example_note2_MainActivity__1performReadAllDates(JNIEnv* env, jobject, jstring key, jobject dateList) {
+    return 0;
+}
+
+/*
+ * Class:     com_example_note2_MainActivity
+ * Method:    _performReadByDate
+ * Signature: (Ljava/util/Date;Ljava/lang/String;Ljava/lang/StringBuilder;)I
+ */
+JNIEXPORT jint JNICALL
+Java_com_example_note2_MainActivity__1performReadByDate(JNIEnv* env, jobject, jobject datetime, jstring key, jobject output) {
+    return 0;
+}
+
+/*
+ * Class:     com_example_note2_MainActivity
+ * Method:    _performWriteToFile
+ * Signature: (Ljava/lang/String;ZLjava/util/Date;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_com_example_note2_MainActivity__1performWriteToFile(JNIEnv* env, jobject, jstring text, jboolean isCustomTime, jobject datetime, jstring key) {
+    return 0;
+}
+
+} // extern "C"

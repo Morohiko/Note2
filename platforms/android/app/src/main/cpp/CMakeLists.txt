@@ -19,8 +19,14 @@ find_library(
         log                  # Name of the log library.
 )
 
+# TODO: fix the path to the note_lib library.
+set(NOTE_LIB_PATH ${CMAKE_SOURCE_DIR}/../../../../../../source)
+add_subdirectory(${NOTE_LIB_PATH} note_lib)
+include_directories(${NOTE_LIB_PATH})
+
 # Link the log library to native-lib.
 target_link_libraries(
         note_andr_lib
         ${log-lib}
+        note_lib
 )

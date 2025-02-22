@@ -8,20 +8,9 @@
 #include "config.h"
 #include "datetime.h"
 
-class Note;
-static Note *note = nullptr;
-
 class Note
 {
 public:
-    Note();
-
-    static int setFilenameHandler(std::string &filename);
-    static int performReadByDateHandler(tm &date, std::wstring &key, std::wstring &outputBody);
-    static int performReadAllDateHandler(std::wstring &key, std::list<std::wstring> &dateList);
-    static int performWriteToFileHandler(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key);
-
-private:
     File file;
     Encoder encoder;
     Parser parser;
@@ -69,6 +58,7 @@ private:
      */
     int performWriteToFile(std::wstring &text, bool isCustomTime, tm& customDateTime, std::wstring &key);
 
+private:
     /**
      * @brief find position of head in file
      *

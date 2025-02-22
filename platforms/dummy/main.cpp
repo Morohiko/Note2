@@ -6,9 +6,7 @@
 #include "log.h"
 
 int main() {
-    Dummy dummy;
-    dummy.setCallbacks(Note::setFilenameHandler, Note::performReadByDateHandler,
-                       Note::performReadAllDateHandler, Note::performWriteToFileHandler);
     LOG_INFO("hello from dummy");
+    Dummy dummy;
     return STATUS_SUCCESS;
 }

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "treeitem.h"
+#include "note.h"
 
 #include <QMainWindow>
 #include <QLabel>
@@ -15,17 +16,12 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow, public Note {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    void setCallbacks(int (*setFilename)(std::string &filename),
-                      int (*performReadByDate)(tm &date, std::wstring &key, std::wstring &outputBody),
-                      int (*performReadAllDate)(std::wstring &key, std::list<std::wstring> &dateList),
-                      int (*performWriteToFile)(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key));
 
     bool isCheckedCheckBoxCustomTime();
     QDateTime getCustomDateTime();
@@ -51,12 +47,6 @@ private:
 
     TreeItem *treeItem = nullptr;
     QTreeWidget *treeWidget = nullptr;
-
-// callbacks
-    int (*setFilenameHandler)(std::string &filename);
-    int (*performReadByDateHandler)(tm &date, std::wstring &key, std::wstring &outputBody);
-    int (*performReadAllDateHandler)(std::wstring &key, std::list<std::wstring> &dateList);
-    int (*performWriteToFileHandler)(std::wstring &text, bool isCustomTime, tm &datetime, std::wstring &key);
 
 private slots:
     void readByTreeWidgetItem(QTreeWidgetItem *item);

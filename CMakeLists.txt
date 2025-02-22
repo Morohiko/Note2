@@ -34,8 +34,7 @@ if (${PLATFORM} STREQUAL "linux")
 elseif(${PLATFORM} STREQUAL "dummy")
     include_directories(platforms/dummy)
     add_executable(${PROJECT_NAME}
-                    platforms/dummy/main.cpp
-                    platforms/dummy/dummy.cpp)
+                    platforms/dummy/main.cpp)
     target_link_libraries(${PROJECT_NAME} note_lib)
 
 elseif(${PLATFORM} STREQUAL "android")

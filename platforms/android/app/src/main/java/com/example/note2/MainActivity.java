@@ -31,7 +31,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Declare the native method.
-    public native String stringFromJNI();
+    public native int _setFilename(String filename);
+    public native int _performReadAllDates(String key, List<Date> dateList);
+    public native int _performReadByDate(Date datetime, String key, StringBuilder output);
+    public native int _performWriteToFile(String text, boolean isCustomTime, Date datetime, String key);
 
     private static final int REQUEST_CODE_BROWSE = 1;
 
@@ -45,12 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxCustomTime;
     private EditText editCustomTime;
     private ListView treeView; // To simulate the treeWidget
-
-    // Callback interfaces to mimic your Qt function pointers
-    private SetFilenameHandler setFilenameHandler;
-    private ReadByDateHandler performReadByDateHandler;
-    private ReadAllDateHandler performReadAllDateHandler;
-    private WriteToFileHandler performWriteToFileHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,47 +115,14 @@ public class MainActivity extends AppCompatActivity {
                 slotCheckBoxCustomTime();
             }
         });
-
-        // Example: Set default callback implementations (these can be replaced later)
-        setCallbacks(new SetFilenameHandler() {
-            @Override
-            public int setFilename(String filename) {
-                // Dummy implementation: log and return success (0)
-                Log.d("Note2:SetFilename", "Filename set: " + filename);
-                return 0;
-            }
-        }, new ReadByDateHandler() {
-            @Override
-            public int readByDate(Date date, String key, StringBuilder output) {
-                // Dummy implementation: return sample text based on date
-                output.append("Sample text for date: " + date.toString());
-                return 0;
-            }
-        }, new ReadAllDateHandler() {
-            @Override
-            public int readAllDate(String key, List<Date> dateList) {
-                // Dummy implementation: add the current date
-                dateList.add(new Date());
-                return 0;
-            }
-        }, new WriteToFileHandler() {
-            @Override
-            public int writeToFile(String text, boolean isCustomTime, Date datetime, String key) {
-                // Dummy implementation: log and return success
-                Log.d("Note2:WriteToFile", "Text: " + text + ", CustomTime: " + isCustomTime +
-                        ", Date: " + datetime + ", Key: " + key);
-                return 0;
-            }
-        });
     }
 
-    // Mimics slotForWriteButton() from Qt
     private void slotForWriteButton() {
         String text = textEdit.getText().toString();
         boolean isCustomTime = checkBoxCustomTime.isChecked();
         Date datetime = getCustomDateTime();
         String key = getKey();
-        int stat = performWriteToFileHandler.writeToFile(text, isCustomTime, datetime, key);
+        int stat = _performWriteToFile(text, isCustomTime, datetime, key);
         if (stat != 0) {
             setColorForButton(btnWrite, Color.RED);
         } else {
@@ -167,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Mimics slotForOpenButton() from Qt
     private void slotForOpenButton() {
         // Open file picker
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -176,16 +139,15 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select File"), REQUEST_CODE_BROWSE);
     }
 
-    // Mimics slotForReadButton() from Qt
     private void slotForReadButton() {
         List<Date> dateList = new ArrayList<>();
         String key = getKey();
-        if (performReadAllDateHandler.readAllDate(key, dateList) == 0) {
+        if (_performReadAllDates(key, dateList) == 0) {
             setColorForButton(btnRead, Color.GREEN);
-            Log.d("Note2:ReadAllDate", "performReadAllDateHandler success");
+            Log.d("Note2:ReadAllDate", "_performReadAllDate success");
         } else {
             setColorForButton(btnRead, Color.RED);
-            Log.d("Note2:ReadAllDate", "performReadAllDateHandler failed");
+            Log.d("Note2:ReadAllDate", "_performReadAllDate failed");
             return;
         }
         // Here you would update your tree view. For demonstration, we simply log the dates.
@@ -204,11 +166,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Mimics readByTreeWidgetItem() from Qt
     private void readByTreeWidgetItem(Date date) {
         String key = getKey();
         StringBuilder output = new StringBuilder();
-        if (performReadByDateHandler.readByDate(date, key, output) == 0) {
+        if (_performReadByDate(date, key, output) == 0) {
             textEdit.setText(output.toString());
         } else {
             textEdit.setText("Error reading file for date " + date.toString());
@@ -236,17 +197,6 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(color);
     }
 
-    // Set the callback implementations (similarly to setCallbacks() in Qt)
-    public void setCallbacks(SetFilenameHandler setFilename,
-                             ReadByDateHandler performReadByDate,
-                             ReadAllDateHandler performReadAllDate,
-                             WriteToFileHandler performWriteToFile) {
-        this.setFilenameHandler = setFilename;
-        this.performReadByDateHandler = performReadByDate;
-        this.performReadAllDateHandler = performReadAllDate;
-        this.performWriteToFileHandler = performWriteToFile;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -254,27 +204,10 @@ public class MainActivity extends AppCompatActivity {
             Uri fileUri = data.getData();
             if (fileUri != null) {
                 String filename = fileUri.toString();
-                int retval = setFilenameHandler.setFilename(filename);
+                int retval = _setFilename(filename);
                 int color = (retval == 0) ? Color.GREEN : Color.RED;
                 setColorForButton(btnOpen, color);
             }
         }
-    }
-
-    // Callback interface definitions
-    public interface SetFilenameHandler {
-        int setFilename(String filename);
-    }
-
-    public interface ReadByDateHandler {
-        int readByDate(Date date, String key, StringBuilder output);
-    }
-
-    public interface ReadAllDateHandler {
-        int readAllDate(String key, List<Date> dateList);
-    }
-
-    public interface WriteToFileHandler {
-        int writeToFile(String text, boolean isCustomTime, Date datetime, String key);
     }
 }
