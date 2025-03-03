@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 // Enum class for log levels to provide type safety
 enum class LogLevel {
@@ -12,10 +13,16 @@ enum class LogLevel {
     DEBUG = 3
 };
 
+enum class LogType {
+    CONSOLE = 0,
+    FILE = 1
+};
+
 class Logger {
 public:
     static LogLevel currentLevel;
-    
+    static LogType currentType;
+
     static std::wstring getLogLevelStr(LogLevel level) {
         switch(level) {
             case LogLevel::ERROR:
@@ -31,13 +38,32 @@ public:
         }
     }
 
+    static void setLogType(LogType type) {
+        currentType = type;
+    }
+
     static void setLogLevel(LogLevel level) {
         currentLevel = level;
     }
 
     template <typename... Args>
     static void log(LogLevel level, Args&&... args) {
-        if (static_cast<int>(level) <= static_cast<int>(currentLevel)) {
+        if (static_cast<int>(level) > static_cast<int>(currentLevel)) {
+            return;
+        }
+
+        if (currentType == LogType::CONSOLE) {
+            // Log to console
+            std::wcout << getLogLevelStr(level) << L": ";
+            (std::wcout << ... << std::forward<Args>(args)) << std::endl;
+        } else if (currentType == LogType::FILE) {
+            // Log to file
+            std::wofstream logFile("log.txt", std::ios_base::app);
+            logFile << getLogLevelStr(level) << L": ";
+            (logFile << ... << std::forward<Args>(args)) << std::endl;
+            logFile.close();
+        } else {
+            // Log to console
             std::wcout << getLogLevelStr(level) << L": ";
             (std::wcout << ... << std::forward<Args>(args)) << std::endl;
         }
@@ -46,6 +72,7 @@ public:
 
 // Initialize static member
 inline LogLevel Logger::currentLevel = LogLevel::DEBUG;
+inline LogType Logger::currentType = LogType::CONSOLE;
 
 // Convenience macros
 #define LOG_ERROR(...) Logger::log(LogLevel::ERROR, __VA_ARGS__)
