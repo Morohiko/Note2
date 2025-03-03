@@ -45,6 +45,23 @@ elseif(${PLATFORM} STREQUAL "android")
         COMMENT "Building app and installing to connected device"
         VERBATIM
     )
+elseif(${PLATFORM} STREQUAL "cli")
+    find_path(FTXUI_INCLUDE_DIR NAMES ftxui/component/component.hpp)
+    include_directories(${FTXUI_INCLUDE_DIR})
+
+    find_library(FTXUI_LIB_COMPONENT NAMES ftxui-component)
+    find_library(FTXUI_LIB_DOM NAMES ftxui-dom)
+    find_library(FTXUI_LIB_SCREEN NAMES ftxui-screen)
+
+    include_directories(platforms/cli)
+    add_executable(${PROJECT_NAME}
+                    platforms/cli/cli.cpp
+                    platforms/cli/main.cpp)
+
+    find_package(Threads REQUIRED)
+
+    target_link_libraries(${PROJECT_NAME} note_lib)
+    target_link_libraries(${PROJECT_NAME} ${FTXUI_LIB_COMPONENT} ${FTXUI_LIB_DOM} ${FTXUI_LIB_SCREEN} Threads::Threads)    
 else()
     message(FATAL_ERROR "platform is not supported")
 endif()
