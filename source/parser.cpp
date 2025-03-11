@@ -51,7 +51,7 @@ int Parser::parseHeadFromStringGetDateString(std::wstring &text, std::wstring &d
                       ", text.length = ", text.length());
         return STATUS_FAILURE;
     }
-    LOG_DEBUG("text  = ", text);
+    LOG_DEBUG("text = ", text);
     date = text.substr(DATE_POSITION, SIZE_OF_DATE);
     return STATUS_SUCCESS;
 }

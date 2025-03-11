@@ -5,10 +5,13 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 #include "cli.h"
 #include "config.h"
 #include "log.h"
+#include "converter.h"
 
 namespace fs = std::filesystem;
 using namespace ftxui;
@@ -105,6 +108,18 @@ std::string cli::run_file_browser() {
     return result;
 }
 
+void cli::read_by_date(std::string &date, std::string &text_content) {
+    std::wstring wdate = std::wstring(date.begin(), date.end());
+    std::wstring wpassword = std::wstring(password_content.begin(), password_content.end());
+    std::wstring woutputBody;
+
+    tm tm_date;
+    Converter::date_string_to_tm(wdate, tm_date);
+
+    performReadByDate(tm_date, wpassword, woutputBody);
+    text_content = Converter::wstring_to_utf8(woutputBody);
+}
+
 void cli::run() {
     auto screen = ScreenInteractive::Fullscreen();
 
@@ -113,10 +128,16 @@ void cli::run() {
     // ---------------------------
     std::vector<std::string> tree_items = {""};
     int selected_item = 0;
+    std::string text_content = "";
     auto tree_component = Menu(&tree_items, &selected_item);
-
-    std::string text_content =
-        "Details for: " + tree_items[selected_item] + " -- Edit this text";
+    tree_component |= CatchEvent([&](Event event) {
+        if (event == Event::Return) {
+            std::string selected_date = tree_items[selected_item];
+            read_by_date(tree_items[selected_item], text_content);
+            return true;
+        }
+        return false;
+    });
     auto input_component = Input(&text_content, "Edit text here...");
 
     // ---------------------------
@@ -135,7 +156,6 @@ void cli::run() {
         .password = true,
         .multiline = false
     };
-    std::string password_content = "";
     auto password_input =
         Input(&password_content, "Enter password...", password_option);
 
@@ -143,10 +163,11 @@ void cli::run() {
     // Browse Files Button.
     // ---------------------------
     std::string selected_file = "";
+    ButtonOption browse_files_option;
     auto browse_files_button = Button("Browse Files", [&]() {
         selected_file = run_file_browser();
         int retval = setFilename(selected_file);
-    });
+    }, browse_files_option);
 
     // ---------------------------
     // Read button.
@@ -179,10 +200,13 @@ void cli::run() {
     });
 
     auto main_renderer = Renderer(main_container, [&]() {
+        int total_width = screen.dimx();
+        int tree_width = total_width * 8 / 100;
+        int input_width = total_width - tree_width;
         return vbox({
             hbox({
-                tree_component->Render() | border | size(HEIGHT, GREATER_THAN, 5),
-                input_component->Render() | border | size(HEIGHT, GREATER_THAN, 5),
+                tree_component->Render() | border | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, EQUAL, tree_width),
+                input_component->Render() | border | size(HEIGHT, GREATER_THAN, 5) | size(WIDTH, EQUAL, input_width)
             }) | flex,
             datetime_input->Render() | border | center,
             password_input->Render() | border | center,
